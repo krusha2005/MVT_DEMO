@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+
+        <div class="card shadow">
+            <div class="card-header text-center">
+                <h4>Seller Registration</h4>
+            </div>
+
+            <div class="card-body">
+
+                <form method="POST">
+                    {% csrf_token %}
+
+                    {{ form.non_field_errors }}
+
+                    <div class="mb-3">
+                        <label>Username</label>
+                        {{ form.username }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Email</label>
+                        {{ form.email }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Password</label>
+                        {{ form.password }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Store Name</label>
+                        {{ form.store_name }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Phone</label>
+                        {{ form.phone }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label>City</label>
+                        {{ form.city }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label>State</label>
+                        {{ form.state }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Select Categories</label><br>
+                        {{ form.categories }}
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100">
+                        Register as Seller
+                    </button>
+
+                </form>
+
+            </div>
+        </div>
+
+        {% if form.errors %}
+        <div class="alert alert-danger">
+            {{ form.errors }}
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container text-center mt-5">
+
+    <h2 class="mb-4">Create Your Account</h2>
+    <p>Select your role to continue</p>
+
+    <div class="row justify-content-center mt-4">
+
+        <!-- Buyer Card -->
+        <div class="col-md-4">
+            <div class="card shadow p-4">
+                <h4>Buyer</h4>
+                <p>Shop products, add to cart & wishlist</p>
+
+                <a href="{% url 'buyer_register' %}" class="btn btn-primary w-100">  Register as Buyer</a>
+            </div>
+        </div>
+
+        <!-- Seller Card -->
+        <div class="col-md-4">
+            <div class="card shadow p-4">
+                <h4>Seller</h4>
+                <p>Sell products & manage your store</p>
+
+                <a href="{% url 'seller_register' %}" class="btn btn-success w-100"> Register as Seller</a>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

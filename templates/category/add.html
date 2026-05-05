@@ -1,0 +1,17 @@
+<h2>Add Category</h2>
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="mb-3">
+        <label>Category Name</label><br>
+        {{ form.name }}
+    </div>
+
+    <div class="mb-3">
+        <label>Category Image (Max 2MB)</label><br>
+        {{ form.image }}
+    </div>
+
+    <button type="submit">Save Category</button>
+</form>
