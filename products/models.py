@@ -8,8 +8,8 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 def validate_image(image):
-    if image.size > 1 * 1024 * 1024:
-        raise ValidationError("Image size should be less than 1MB")
+    if image.size > 2 * 1024 * 1024:
+        raise ValidationError("Image size should be less than 2MB")
 
     ext = os.path.splitext(image.name)[1].lower()
     if ext not in ['.jpg', '.jpeg', '.png']:
@@ -126,6 +126,7 @@ class ProductImage(models.Model):
     image = models.ImageField(upload_to='products/', validators=[validate_image])
 
     def save(self, *args, **kwargs):
+        validate_image(self.image)
         if self.image:
             self.image = compress_image(self.image)
 

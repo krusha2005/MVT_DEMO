@@ -4,7 +4,7 @@ from .forms import ProductForm, ProductImageForm
 from .models import Category, SubCategory, ProductType, ProductImage
 from django.contrib import messages
 from products.models import Product
-
+from django.core.exceptions import ValidationError
 
 
 def add_category(request):
@@ -68,8 +68,26 @@ def select_product_type(request, category_id, subcategory_id):
             product.category = product_type.subcategory.category
             product.save()
 
-            for img in images:
-                ProductImage.objects.create(product=product, image=img)
+            '''try except for if image is >2mb then it handle'''
+            try:
+                for img in images:
+                    ProductImage.objects.create(
+                        product=product,
+                        image=img
+                    )
+
+            except ValidationError as e:
+                form.add_error(None, e.messages[0])
+                product.delete()
+
+                return render(request,'products/select_product_type.html',
+                    {
+                        'form': form,
+                        'types': types,
+                        'subcategory': subcategory,
+                        'selected_type':selected_type
+                    }
+                )
 
             messages.success(request, "Product added successfully")
             return redirect(request.path)
