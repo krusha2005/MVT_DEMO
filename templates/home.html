@@ -4,7 +4,64 @@
 
 {% block content %}
 
-<h2>Welcome to My Marketplace</h2>
-<p>This is home page</p>
+<div class="container mt-4">
+
+    <!-- CATEGORY SECTION -->
+    <h3 class="mb-3">Shop by Category</h3>
+
+    <div class="row">
+        {% for cat in categories %}
+            <div class="col-md-3 mb-3">
+                <div class="card shadow-sm text-center p-2">
+                    {% if cat.image %}
+                        <img src="{{ cat.image.url }}" height="150" style="object-fit:cover;">
+                    {% endif %}
+                    <h5 class="mt-2">{{ cat.name }}</h5>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- PRODUCT SECTION -->
+    <h3 class="mt-5 mb-3">Products</h3>
+
+    <div class="row">
+        {% for product in products %}
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm p-2">
+
+                    <!-- Product Image -->
+                    {% if product.images.all %}
+                        <img src="{{ product.images.first.image.url }}" height="200" style="object-fit:cover;">
+                    {% endif %}
+
+                    <div class="mt-2">
+                        <h6>{{ product.name }}</h6>
+
+                        <!-- Store Name -->
+                        <p class="text-muted mb-1">
+                            Store:
+                            <strong>
+                                {{ product.seller.seller_profile.store_name }}
+                            </strong>
+                        </p>
+
+                        <small class="text-muted">
+                            {{ product.category.name }} / {{ product.subcategory.name }}
+                        </small>
+
+                        <p class="mt-1">{{ product.description|truncatewords:8 }}</p>
+
+                        <strong>₹{{ product.price }}</strong>
+                    </div>
+
+                </div>
+            </div>
+        {% empty %}
+            <p>No products available</p>
+        {% endfor %}
+    </div>
+
+</div>
 
 {% endblock %}

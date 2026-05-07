@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h3>{{ subcategory.name }} → Choose Product Type</h3>
+
+    <!-- PRODUCT TYPES -->
+    <div class="row">
+        {% for type in types %}
+            <div class="col-md-3">
+                <div class="card p-2 text-center type-card"onclick='showForm({{ type.id }},
+                       "{{ type.name|escapejs }}",
+                       "{{ subcategory.name|escapejs }}",
+                       "{{ subcategory.category.name|escapejs }}")'>
+
+                    {% if type.image %}
+                        <img src="{{ type.image.url }}" height="180" style="object-fit: fill;">
+                    {% endif %}
+
+                    <h5 class="p-1">{{ type.name }}</h5>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- FORM (hidden initially if error then it show again ) -->
+    <div id="product-form"style="{% if form.errors %}display:block;{% else %}display:none;{% endif %}"class="mt-5">
+
+        <h3>Add Product</h3>
+
+        <!-- ✅ Show selected path -->
+        <div id="selected-path" class="alert alert-info" style="display:none;"></div>
+
+        <h4 id="selected-type"></h4>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <input type="hidden" name="type_id" id="type_id">
+
+            <!-- Product fields -->
+            <div class="mb-3">
+                <label>Name</label>
+                {{ form.name }}
+            </div>
+
+            <div class="mb-3">
+                <label>Description</label>
+                {{ form.description }}
+            </div>
+
+            <div class="mb-3">
+                <label>Price</label>
+                {{ form.price }}
+            </div>
+
+            <div class="mb-3">
+                <label>Stock</label>
+                {{ form.stock }}
+                <div class="text-danger">{{ form.stock.errors }}</div>
+            </div>
+            <!-- Images -->
+            <div class="mb-3">
+                <small class="text-muted">Max 5 images allowed</small>
+                <input type="file" name="images" multiple class="form-control" id="imageInput" required>
+                <div id="imageError" class="text-danger mt-1"></div>
+                <!-- <div id="preview"></div> -->
+            </div>
+
+            <button type="submit" class="btn btn-success">
+                Add Product
+            </button>
+        </form>
+    
+    </div>
+
+</div>
+
+<!-- JS -->
+<script>
+
+const input = document.getElementById("imageInput");
+const errorDiv = document.getElementById("imageError");
+
+input.addEventListener("change", function() {
+    if (this.files.length > 5) {
+        errorDiv.innerText = "You can upload maximum 5 images only!!";
+        this.value = "";  // clear selection
+    } else {
+        errorDiv.innerText = "";
+    }
+});
+
+
+function showForm(typeId, typeName, subName, catName) {
+    document.getElementById("product-form").style.display = "block";
+    document.getElementById("type_id").value = typeId;
+
+    document.getElementById("product-form").scrollIntoView({behavior: "smooth"});
+
+    // '''for show which product we add from category-->subcategory-->product_type '''
+    let path = catName + " → " + subName + " → " + typeName;
+    let div = document.getElementById("selected-path");
+
+    div.innerHTML = "<strong>Selected:</strong> " + path;
+    div.style.display = "block";
+}
+
+// document.getElementById("imageInput").addEventListener("change", function() {
+//     let preview = document.getElementById("preview");
+//     preview.innerHTML = "";
+
+//     Array.from(this.files).forEach(file => {
+//         let reader = new FileReader();
+
+//         reader.onload = function(e) {
+//             let img = document.createElement("img");
+//             img.src = e.target.result;
+//             img.style.height = "80px";
+//             img.style.margin = "5px";
+//             preview.appendChild(img);
+//         };
+
+//         reader.readAsDataURL(file);
+//     });
+// });
+
+</script>
+
+{% endblock %}

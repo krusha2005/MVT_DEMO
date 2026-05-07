@@ -3,6 +3,9 @@ from django.shortcuts import render, redirect
 from .models import SellerProfile, User
 from .forms import LoginForm, BuyerRegisterForm, SellerRegisterForm
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from products.models import Product
+
 
 # for register choice page 
 def register_choice(request):
@@ -42,7 +45,7 @@ def user_login(request):
             if user.role == 'buyer':
                 return redirect('home')
             elif user.role == 'seller':
-                return redirect('seller_dashboard')
+                return redirect('home')
 
         else:
             messages.error(request, "Invalid username or password")  # ✅
@@ -85,31 +88,42 @@ def seller_register(request):
 
     return render(request, 'accounts/seller_register.html', {'form': form})
 
-# def seller_register(request):
-#     if request.method == 'POST':
-#         form = SellerRegisterForm(request.POST)
 
-#         if form.is_valid():
-#             user = form.save(commit=False)
+# @login_required
+# def seller_dashboard(request):
+#     user = request.user
 
-#             # IMPORTANT: set password BEFORE saving user
-#             password = form.cleaned_data.get('password')
-#             user.set_password(password)
+#     # seller profile
+#     seller_profile = user.seller_profile
 
-#             user.role = 'seller'
-#             user.save()
+#     # categories seller selected
+#     categories = seller_profile.categories.all()
 
-#             # save seller profile
-#             seller_profile = SellerProfile.objects.create(user=user)
-#             categories = form.cleaned_data.get('categories')
-#             if categories:
-#                 seller_profile.categories.set(categories)
+#     # seller products
+#     products = Product.objects.filter(seller=user)
 
-#             messages.success(request, "Seller account created successfully")
+#     context = {
+#         'categories': categories,
+#         'products': products
+#     }
 
-#             return redirect('login')
+#     return render(request, 'accounts/seller_dashboard.html', context)
 
-#     else:
-#         form = SellerRegisterForm()
 
-#     return render(request, 'accounts/seller_register.html', {'form': form})
+@login_required
+def seller_dashboard(request):
+    user = request.user
+
+    try:
+        seller = user.seller_profile
+    except:
+        # recreate profile if missing
+        seller = SellerProfile.objects.create(user=user)
+
+    categories = seller.categories.all()
+    product=user.products.all()
+
+    return render(request, 'accounts/seller_dashboard.html', {
+        'categories': categories,
+        'products' : product
+    })

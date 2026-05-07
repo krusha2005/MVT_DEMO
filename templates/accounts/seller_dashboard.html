@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2 >Seller Dashboard</h2>
+
+    <!-- CATEGORY SECTION -->
+
+
+    <div class="row">
+        <h4>your categories</h4>
+        {% for cat in categories %}
+            <div class="col-md-3 mb-3">
+                <a href="{% url 'select_subcategory' cat.id %}" style="text-decoration: none;">
+                    <div class="card p-2 text-center">
+                        {% if cat.image %}
+                            <img src="{{ cat.image.url }}" height="180" style="object-fit: fill;">
+                        {% endif %}
+                        <h5 class="p-1">{{ cat.name }}</h5>
+                    </div>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+    <hr>
+
+    <!-- PRODUCT SECTION -->
+    <div class="row">
+    <h4>Your Products</h4>
+    {% for product in products %}
+        <div class="col-md-3">
+            <div class="card p-2 ">
+
+                <!-- ✅ Product Image -->
+                {% if product.images.all %}
+                    <img src="{{ product.images.first.image.url }}" height="200" style="object-fit: fill;">
+
+                {% else %}
+                    <p>No Image</p>
+                {% endif %}
+
+                <h5>{{ product.name }}</h5>
+                <p>{{ product.description|truncatewords:8 }}</p>
+                <p>price: ₹{{ product.price }}</p>
+                <p>Stock: {{ product.stock }}</p>
+
+                <!-- ✅ Buttons -->
+                <a href="{% url 'edit_product' product.id %}"class="btn btn-outline-info" style="margin-bottom:2px;">Edit</a>
+
+                <a href="{% url 'delete_product' product.id %}"class="btn btn-outline-danger">Delete</a>
+
+            </div>
+        </div>
+    {% empty %}
+        <p>No products yet</p>
+    {% endfor %}
+</div>
+
+{% endblock %}

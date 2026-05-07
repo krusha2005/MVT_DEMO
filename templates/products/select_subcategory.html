@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <h3>{{ category.name }} → Choose SubCategory</h3>
+
+    <div class="row">
+        {% for sub in subcategories %}
+            <div class="col-md-3 shadow-sm">
+                <a href="{% url 'select_product_type' category.id sub.id %}" style="text-decoration: none;">
+                    <div class="card p-2 text-center">
+                        {% if sub.image %}
+                            <img src="{{ sub.image.url }}" height="180" style="object-fit: fill;">
+                        {% endif %}
+                        <h5 class="p-1">{{ sub.name }}</h5>
+                    </div>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}
