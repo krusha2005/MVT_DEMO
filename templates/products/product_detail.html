@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <div class="row">
+
+        <!-- MAIN IMAGE -->
+        <div class="col-md-5">
+            {% if product.images.first %}
+
+                <img id="main-image"
+                    src="{{ product.images.first.image.url }}"
+                    class="img-fluid rounded shadow w-100"
+                    style="height:500px; object-fit:fill;">
+
+            {% endif %}
+
+            <!-- OTHER IMAGES -->
+            <div class="d-flex mt-3 gap-2 flex-wrap">
+                {% for img in product.images.all %}
+
+                    <img src="{{ img.image.url }}"
+                        width="80"
+                        height="80"
+                        class="rounded border thumbnail-img"
+                        style="object-fit:cover; cursor:pointer;">
+
+                {% endfor %}
+            </div>
+        </div>
+
+
+        <!-- PRODUCT DETAILS -->
+        <div class="col-md-7">
+
+            <h2>Name : {{ product.name }}</h2>
+
+            <h4 class="text-success">
+               Price: ₹{{ product.price }}
+            </h4>
+
+            <p>
+               Discription : {{ product.description }}
+            </p>
+
+            <p>
+                Store:
+                <strong>
+                    {{ product.seller.seller_profile.store_name }}
+                </strong>
+            </p>
+
+            <p> 
+                Category: {{ product.category.name }}
+            </p>
+
+            <p>
+                Type: {{ product.product_type.name }}
+            </p>
+
+            <!-- STOCK -->
+            {% if product.stock > 0 %}
+                <p class="text-success">
+                    Only {{ product.stock }} left in stock
+                </p>
+
+            {% else %}
+
+                <p class="text-danger">
+                    Out of Stock
+                </p>
+
+            {% endif %}
+
+            <!-- BUTTONS -->
+            <div class="d-flex gap-2">
+
+                <button class="btn btn-outline-dark"> Add to Cart </button>
+
+                <button class="btn btn-outline-primary"> Buy Now </button>
+
+                <a href="{% url 'add_to_wishlist' product.id %}" class="btn btn-outline-danger">
+                    Wishlist
+                </a>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+let thumbnails = document.querySelectorAll(".thumbnail-img");
+let mainImage = document.getElementById("main-image");
+
+thumbnails.forEach(function(img){
+
+    img.addEventListener("click", function(){
+        mainImage.src = this.src;
+    });
+});
+
+</script>
+
+{% endblock%}

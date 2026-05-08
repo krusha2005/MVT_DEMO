@@ -157,3 +157,36 @@ def delete_product(request, id):
 
     product.delete()
     return redirect('seller_dashboard')
+
+def product_detail(request, id):
+
+    product = get_object_or_404( 
+        Product,
+        id=id
+    )
+
+    return render(request, 'products/product_detail.html',{'product': product})
+
+# @login_required
+# def add_to_wishlist(request,id):
+
+#     product=get_object_or_404(Product, id=id)
+
+#     Wishlist.objects.get_or_create(
+#         user=request.user,
+#         product=product
+#     )
+#     messages.success('request','Product Added In Wishlist')
+
+#     return redirect('wishlist')
+
+
+# @login_required
+# def wishlist(request):
+
+#     wishlist_items=Wishlist.objects.filter(
+#         user=user.request
+#     )
+
+#     return render(request,'products/wishlist.html',{'wishlist_items':wishlist_items})
+

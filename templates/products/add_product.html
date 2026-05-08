@@ -57,4 +57,99 @@
 
 </div>
 
+<script>
+    const searchForm = document.getElementById('search-form');
+    
+    searchForm.addEventListener('submit', function() {
+        // We use setTimeout to clear the fields AFTER the form data is sent
+        setTimeout(() => {
+            // This resets all inputs, selects, and textareas inside the form
+            searchForm.reset();
+            
+            // Specifically for the subcategory logic we wrote earlier:
+            // Ensure all options are visible again for the next search
+            document.querySelectorAll('.sub-option').forEach(opt => {
+                opt.style.display = "block";
+            });
+        }, 100); // 100 milliseconds is enough time for the browser to trigger the GET request
+    });
+
+</script>
+
+
+
+
+
+
+<div class="container mt-5">
+
+    <h3 class="mb-4">
+        My Wishlist
+    </h3>
+
+    <div class="row">
+
+        {% for item in wishlist_items %}
+
+            <div class="col-md-3 mb-4">
+
+                <div class="card p-2 shadow-sm">
+
+                    {% if item.product.images.first %}
+
+                        <img src="{{ item.product.images.first.image.url }}"
+                             height="220"
+                             style="object-fit:cover;">
+
+                    {% endif %}
+
+                    <h5 class="mt-2">
+
+                        {{ item.product.name }}
+
+                    </h5>
+
+                    <p>
+
+                        ₹{{ item.product.price }}
+
+                    </p>
+
+                    <p class="text-muted">
+
+                        {{ item.product.description|truncatewords:8 }}
+
+                    </p>
+
+                    <div class="d-flex gap-2">
+
+                        <button class="btn btn-dark btn-sm">
+
+                            Add to Cart
+
+                        </button>
+
+                        <button class="btn btn-warning btn-sm">
+
+                            Buy Now
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        {% empty %}
+
+            <p>
+                Wishlist is empty
+            </p>
+
+        {% endfor %}
+
+    </div>
+
+</div>
 {% endblock %}

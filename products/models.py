@@ -131,3 +131,4 @@ class ProductImage(models.Model):
             self.image = compress_image(self.image)
 
         super().save(*args, **kwargs)
+

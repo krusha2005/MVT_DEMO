@@ -7,40 +7,87 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
+            <ul class="navbar-nav ms-auto align-items-center">
+
                 <li class="nav-item">
                     <a class="nav-link" href="/">Home</a>
                 </li>
 
                 {% if user.is_authenticated %}
 
-                <li class="nav-item">
-                    <a class="nav-link">Hello {{ user.username }}</a>
-                </li>
+                    <!-- Buyer Icons -->
+                    {% if user.role == 'buyer' %}
 
-                {% if user.role == 'seller' %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'seller_dashboard' %}">
-                    Dashboard
-                    </a>
-                </li>
-                {% endif %}
+                        <li class="nav-item me-2">
+                            <a class="nav-link position-relative" href="{% url 'wishlist' %}">
 
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'logout' %}">Logout</a>
-                </li>
+                                <i class="bi bi-heart fs-5" href="{% url 'wishlist' %}"></i>
+                                <!-- Wishlist Count -->
+                                <span class="position-absolute top-20 start-100 translate-middle badge rounded-pill bg-danger">
+                                    {{request.user.wishlist_set.count}}
+                                    <!-- wishlist_set is djnago reverse reln it take all user wishlist (we can use related_name instend of _set) -->
+                                </span>
+
+                            </a>
+                        </li>
+
+                        <li class="nav-item me-3">
+                            <a class="nav-link position-relative" >
+
+                                <i class="bi bi-cart3 fs-5"></i>
+                                <!-- Cart Count -->
+                                <span class="position-absolute top-20 start-100 translate-middle badge rounded-pill bg-warning text-dark">
+                                   0
+                                </span>
+
+                            </a>
+                        </li>
+
+                    {% endif %}
+
+                    <!-- Username -->
+                    <li class="nav-item">
+                        <a class="nav-link">
+                            Hello {{ user.username }}
+                        </a>
+                    </li>
+
+                    <!-- Seller Dashboard -->
+                    {% if user.role == 'seller' %}
+                        <li class="nav-item">
+                            <a class="nav-link"
+                            href="{% url 'seller_dashboard' %}">
+                                Dashboard
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    <!-- Logout -->
+                    <li class="nav-item">
+                        <a class="nav-link"
+                        href="{% url 'logout' %}">
+                            Logout
+                        </a>
+                    </li>
 
                 {% else %}
 
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'register_choice' %}">Register</a>
-                </li>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                        href="{% url 'register_choice' %}">
+                            Register
+                        </a>
+                    </li>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'login' %}">Login</a>
-                </li>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                        href="{% url 'login' %}">
+                            Login
+                        </a>
+                    </li>
 
                 {% endif %}
+
             </ul>
         </div>
     </div>

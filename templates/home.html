@@ -6,6 +6,74 @@
 
 <div class="container mt-4">
 
+    <form method="GET" class="row mb-4" id="search-form">
+
+        <!-- Search -->
+        <div class="col-md-3">
+            <input type="text" name="search" class="form-control" placeholder="Search products">
+        </div>
+
+        <!-- Category -->
+        <div class="col-md-2">
+            <select name="category" class="form-select" id="category_dropdown">
+                <option value="">Category</option>
+
+                {% for cat in categories %}
+                    <option value="{{ cat.id }}" class="cat-option" {% if request.GET.category == cat.id|stringformat:"s" %}selected{% endif %}>
+                    <!-- {% if request.GET.category == cat.id|stringformat:"s" %}selected{% endif %}> -->
+                        {{ cat.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- SubCategory -->
+        <div class="col-md-2">
+            <select name="subcategory" class="form-select" id="subcategory_dropdown">
+                <option value="">SubCategory</option>
+
+                {% for sub in subcategories %}
+                    <option value="{{ sub.id }}" 
+                data-category="{{ sub.category.id }}" 
+                class="sub-option"
+                {% if request.GET.subcategory == sub.id|stringformat:"s" %}selected{% endif %}>
+                    <!-- <option value="{{ sub.id }}"{% if request.GET.subcategory == sub.id|stringformat:"s" %}selected{% endif %}> -->
+                        {{ sub.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Product Type -->
+        <!-- <div class="col-md-2">
+            <select name="product_type" class="form-select">
+                <option value="">Product Type</option>
+
+                {% for type in product_types %}
+                    <option value="{{ type.id }}">
+                        {{ type.name }}
+                    </option>
+                {% endfor %}
+
+            </select>
+        </div> -->
+
+        <!-- Price -->
+        <div class="col-md-1">
+            <input type="number" name="min_price" class="form-control"  placeholder="Min">
+        </div>
+
+        <div class="col-md-1">
+            <input type="number" name="max_price" class="form-control" placeholder="Max">
+        </div>
+
+        <!-- Button -->
+        <div class="col-md-1">
+            <button class="btn btn-outline-primary w-100" id="search-btn">Search</button>
+        </div>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
+
+    </form>
+
     <!-- CATEGORY SECTION -->
     <h3 class="mb-3">Shop by Category</h3>
 
@@ -27,41 +95,135 @@
 
     <div class="row">
         {% for product in products %}
-            <div class="col-md-3 mb-4">
-                <div class="card shadow-sm p-2">
 
-                    <!-- Product Image -->
-                    {% if product.images.all %}
-                        <img src="{{ product.images.first.image.url }}" height="200" style="object-fit:cover;">
-                    {% endif %}
+            {% if user.role == 'buyer' %}
+            <!-- if user is buyer then he can buy nd show there detail -->
+                <div class="col-md-3 mb-4">
+                    <a href="{% url 'product_detail' product.id %}" class="text-decoration-none text-dark">
+                    <div class="card shadow-sm p-2">
 
-                    <div class="mt-2">
-                        <h6>{{ product.name }}</h6>
+                        <!-- Product Image -->
+                        {% if product.images.all %}
+                            <img src="{{ product.images.first.image.url }}" height="200" style="object-fit:cover;">
+                        {% endif %}
 
-                        <!-- Store Name -->
-                        <p class="text-muted mb-1">
-                            Store:
-                            <strong>
-                                {{ product.seller.seller_profile.store_name }}
-                            </strong>
-                        </p>
+                        <div class="mt-2">
+                            <h6>{{ product.name }}</h6>
 
-                        <small class="text-muted">
-                            {{ product.category.name }} / {{ product.subcategory.name }}
-                        </small>
+                            <!-- Store Name -->
+                            <p class="text-muted mb-1">
+                                Store:
+                                <strong>
+                                    {{ product.seller.seller_profile.store_name }}
+                                </strong>
+                            </p>
 
-                        <p class="mt-1">{{ product.description|truncatewords:8 }}</p>
+                            <small class="text-muted">
+                                {{ product.category.name }} / {{ product.subcategory.name }}
+                            </small>
 
-                        <strong>₹{{ product.price }}</strong>
+                            <p class="mt-1">{{ product.description|truncatewords:8 }}</p>
+
+                            <strong>₹{{ product.price }}</strong>
+                        </div>
+
                     </div>
-
+                    </a>
                 </div>
-            </div>
+            {% else %}
+            <!-- if user is not buyer then he can not show product detail nd buy -->
+                <div class="col-md-3 mb-4">
+                    <div class="card shadow-sm p-2">
+
+                        <!-- Product Image -->
+                        {% if product.images.all %}
+                            <img src="{{ product.images.first.image.url }}" height="200" style="object-fit:cover;">
+                        {% endif %}
+
+                        <div class="mt-2">
+                            <h6>{{ product.name }}</h6>
+
+                            <!-- Store Name -->
+                            <p class="text-muted mb-1">
+                                Store:
+                                <strong>
+                                    {{ product.seller.seller_profile.store_name }}
+                                </strong>
+                            </p>
+
+                            <small class="text-muted">
+                                {{ product.category.name }} / {{ product.subcategory.name }}
+                            </small>
+
+                            <p class="mt-1">{{ product.description|truncatewords:8 }}</p>
+
+                            <strong>₹{{ product.price }}</strong>
+                        </div>
+
+                    </div>
+                    
+                </div>
+            {% endif %}
         {% empty %}
-            <p>No products available</p>
+            <p class="text-primary">No products available</p>
+
         {% endfor %}
     </div>
 
 </div>
+
+<script>
+//for catgory and subcatory drop-down to select values nd search
+document.getElementById('category_dropdown').addEventListener('change', function() {
+    var selectedCategory = this.value;
+    var subOptions = document.querySelectorAll('.sub-option');
+    
+    subOptions.forEach(function(opt) {
+        // If "All Categories" is selected or category matches, show it
+        if (selectedCategory === "" || opt.getAttribute('data-category') === selectedCategory) {
+            opt.style.display = "block";
+        } else {
+            opt.style.display = "none";
+        }
+    });
+    
+    // Reset subcategory selection when category changes
+    document.getElementById('subcategory_dropdown').value = "";
+});
+
+//for search button to reset all fileds after search 
+const searchForm = document.getElementById('search-form');
+
+searchForm.addEventListener('submit',function(){
+    //set timeout for after serach data is clean again
+    setTimeout(()=>{
+        // reset every filed text,select,min,max
+        searchForm.reset();
+
+        // for after search all optio are visible for next search
+        document.querySelectorAll('.sub-option').forEach(opt=>{
+            opt.style.display="block";
+        })
+
+        // document.querySelectorAll('.cat-option').forEach(opt=>{
+        //     opt.innerHTML="";
+        // })
+    },100
+    )
+})
+
+    // document.querySelector('form').addEventListener('submit', function(e) {
+    //     // We use a small delay (0.1s)
+    //     // This gives the browser enough time to "capture" the data to send to Django
+    //     // but clears the UI before the next page load finishes.
+    //     const form = this;
+    //     setTimeout(() => {
+    //         form.reset();
+    //         // Optional: specifically target the search text input
+    //         document.querySelector('input[name="search"]').value = "";
+    //     }, 100);
+    // });
+
+</script>
 
 {% endblock %}
