@@ -3,6 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Cart, CartItem
 from products.models import Product
+from wishlist.models import Wishlist
+from django.urls import reverse
 
 
 @login_required
@@ -20,11 +22,15 @@ def add_to_cart(request, id):
         product=product
     )
 
+    '''for in cart if product is already in cart then it increase product'''
     if not created:
 
         if (cart_item.quantity < 5 and cart_item.quantity < product.stock):
             cart_item.quantity += 1
             cart_item.save()
+
+    '''for in wishlist id that product add in cart then remove from wishlist'''
+    Wishlist.objects.filter(user=request.user,product=product).delete()
 
     messages.success(request,"Product added to cart")
     return redirect('cart')
@@ -59,7 +65,9 @@ def increase_quantity(request,id):
         item.quantity += 1
         item.save()
 
-    return redirect('cart')
+        return redirect('cart')
+
+    return redirect(f"{reverse('cart')}?error_item={item.id}")
 
 @login_required
 def decrease_quantity(request,id):
@@ -70,7 +78,9 @@ def decrease_quantity(request,id):
         item.quantity -= 1
         item.save()
 
-    return redirect('cart')
+        return redirect('cart')
+
+    return redirect(f"{reverse('cart')}?error_item={item.id}")
 
 @login_required
 def remove_cart_item(request,id):

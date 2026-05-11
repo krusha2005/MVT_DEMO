@@ -10,7 +10,6 @@
         {% for item in wishlist_items %}
 
             <div class="col-md-3 mb-4">
-
                 <div class="card p-2 shadow-sm">
 
                     {% if item.product.images.first %}
@@ -41,21 +40,19 @@
 
                     <div class="d-flex gap-3">
 
-                        <button class="btn btn-outline-dark btn-sm">
-                            Add to Cart
-                        </button>
+                        <a href="{% url 'add_to_cart' item.product.id %}" class="btn btn-outline-dark btn-sm">Add To Cart</a>
 
                         <button class="btn btn-outline-primary btn-sm">
                             Buy Now
                         </button>
 
-                        <a href="{% url 'remove_wish' item.id %}" class="btn btn-outline-danger">Remove</a>
+                        <a href="{% url 'remove_wish' item.id %}" class="btn btn-outline-danger btn-sm">Remove</a>
                     </div>
                 </div>
             </div>
 
         {% empty %}
-            <p>
+            <p class="text-warning">
                 Wishlist is empty
             </p>
         {% endfor %}

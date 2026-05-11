@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block title %}Cart{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <div class="mb-4" style="text-decoration: underline; font-size:xx-large;">My Cart</div>
+    <div class="row">
+        {% for item in cart_items %}
+        <div class="col-md-12 mb-3">
+
+            <div class="card p-2 shadow-sm ">
+                
+                <div class="row align-items-center">
+
+                    <!-- Image -->
+                    <div class="col-md-2">
+                        {%if item.product.images.first %}
+                            <img src="{{ item.product.images.first.image.url }}" class="img-fluid" style="object-fit: cover; height: 120px;" >
+                        {% endif %}
+                    </div>
+
+                    <!-- product detail -->
+                    <div class="col-md-3">
+                        <h5>{{item.product.name}}</h5>
+
+                        <p>price: 
+                            <strong>₹{{ item.product.price }} </strong>
+                        </p>
+
+                        <small class="text-muted">
+                            Store:{{ item.product.seller.seller_profile.store_name }}
+                        </small>
+                    </div>
+
+                    <!-- product quantity -->
+                    <div class="col-md-3">
+                        <div class="align-items-center gap-2 d-flex">
+
+                            <a href="{% url 'decrease_quantity' item.id %}" style="font-size:xx-large; font-weight:500px; text-decoration: none;" > - </a>
+                            
+                            <strong>{{item.quantity}}</strong>
+                            
+                            <a href="{% url 'increase_quantity' item.id %}" style="font-size: large; font-weight: 700px; text-decoration: none;"> + </a>
+                        </div>
+
+                       {% if request.GET.error_item == item.id|stringformat:"s" %}
+                            <small class="text-danger">
+                                Quantity can't be less than 1 and more than 5 or stock available!
+                            </small>    
+                        {% endif %}
+
+                        <br>
+                        <small class="text-warning">
+                            {{item.product.stock}} Available
+                        </small>
+                    </div>
+
+                    <!-- total price -->
+                    <div class="col-md-2">
+                        <strong>₹ {{item.total_price}}</strong>
+                    </div>
+
+                    <div class="col-md-2">
+                        <button class="btn btn-outline-primary btn-sm ">Buy Now</button>
+                        <a href="{% url 'remove_cart_item' item.id %}" class="btn btn-outline-danger btn-sm"> X </a>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+        {% empty %}
+            <h3>cart is empty!!</h3>
+        {% endfor %}
+
+        <!-- All Product Total -->
+         <div class="text-end mt-4">
+            <h3>Total: ₹{{ total }}</h3>
+            <button class="btn-outline-success btn btn-sm">Procced To Checkout</button>
+         </div>
+
+    </div>
+</div>
+
+{% endblock %}
