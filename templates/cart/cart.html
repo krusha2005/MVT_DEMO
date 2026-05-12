@@ -62,7 +62,7 @@
                     </div>
 
                     <div class="col-md-2">
-                        <button class="btn btn-outline-primary btn-sm ">Buy Now</button>
+                        <a href="{% url 'buy_now' item.product.id%}" class="btn btn-outline-primary btn-sm">Buy Now</a>
                         <a href="{% url 'remove_cart_item' item.id %}" class="btn btn-outline-danger btn-sm"> X </a>
                     </div>
 
@@ -77,7 +77,7 @@
         <!-- All Product Total -->
          <div class="text-end mt-4">
             <h3>Total: ₹{{ total }}</h3>
-            <button class="btn-outline-success btn btn-sm">Procced To Checkout</button>
+            <a href="{% url 'checkout' %}" class="btn btn-outline-success btn-sm">Procced To Checkout</a>
          </div>
 
     </div>

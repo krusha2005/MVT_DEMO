@@ -76,9 +76,15 @@
             <!-- BUTTONS -->
             <div class="d-flex gap-2">
 
-                <a href="{% url 'add_to_cart' product.id %}" class="btn btn-outline-dark">Add To Cart</a>
+                {% if product.stock > 0 %}
+                    <!-- <p class="text-success">In Stock</p> -->
+                    <a class="btn btn-outline-dark" href="{% url 'add_to_cart' product.id  %}">Add To Cart</a>
+                    <a class="btn btn-outline-primary" href="{% url 'buy_now' product.id  %}" >Buy Now</a>
 
-                <button class="btn btn-outline-primary"> Buy Now </button>
+                {% else %}
+                    <!-- <p class="text-danger">Out Of Stock</p> -->
+                    <button class="btn btn-outline-danger" disabled >Out Of Stock</button>
+                {% endif %}
 
                 <a href="{% url 'add_to_wishlist' product.id %}" class="btn btn-outline-danger">
                     Wishlist

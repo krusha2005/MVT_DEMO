@@ -22,6 +22,11 @@ def add_to_cart(request, id):
         product=product
     )
 
+    '''for stock if it out of stock then return in product detail nd buyer can't buy'''
+    if product.stock <= 0:
+        messages.error(request,'product is out of stock')
+        return redirect('product_detail',id=product.id)
+
     '''for in cart if product is already in cart then it increase product'''
     if not created:
 

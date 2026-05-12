@@ -7,14 +7,14 @@ from products.models import Product
 from django.core.exceptions import ValidationError
 
 
-def add_category(request):
-    form = CategoryForm(request.POST or None, request.FILES or None)
+# def add_category(request):
+#     form = CategoryForm(request.POST or None, request.FILES or None)
 
-    if form.is_valid():
-        form.save()
-        return redirect('category_list')
+#     if form.is_valid():
+#         form.save()
+#         return redirect('category_list')
 
-    return render(request, 'category/add.html', {'form': form})
+#     return render(request, 'category/add.html', {'form': form})
 
 def select_subcategory(request, category_id):
     category = get_object_or_404(Category, id=category_id)
@@ -167,26 +167,4 @@ def product_detail(request, id):
 
     return render(request, 'products/product_detail.html',{'product': product})
 
-# @login_required
-# def add_to_wishlist(request,id):
-
-#     product=get_object_or_404(Product, id=id)
-
-#     Wishlist.objects.get_or_create(
-#         user=request.user,
-#         product=product
-#     )
-#     messages.success('request','Product Added In Wishlist')
-
-#     return redirect('wishlist')
-
-
-# @login_required
-# def wishlist(request):
-
-#     wishlist_items=Wishlist.objects.filter(
-#         user=user.request
-#     )
-
-#     return render(request,'products/wishlist.html',{'wishlist_items':wishlist_items})
 

@@ -42,9 +42,7 @@
 
                         <a href="{% url 'add_to_cart' item.product.id %}" class="btn btn-outline-dark btn-sm">Add To Cart</a>
 
-                        <button class="btn btn-outline-primary btn-sm">
-                            Buy Now
-                        </button>
+                        <a href="{% url 'buy_now' item.product.id %}" class="btn btn-outline-primary btn-sm">Buy Now</a>
 
                         <a href="{% url 'remove_wish' item.id %}" class="btn btn-outline-danger btn-sm">Remove</a>
                     </div>
