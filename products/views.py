@@ -2,9 +2,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .forms import ProductForm, ProductImageForm
 from .models import Category, SubCategory, ProductType, ProductImage
+from cart.models import CartItem
 from django.contrib import messages
 from products.models import Product
 from django.core.exceptions import ValidationError
+from wishlist.models import Wishlist
 
 
 # def add_category(request):
@@ -33,7 +35,7 @@ def select_product_type(request, category_id, subcategory_id):
 
 
     '''after select product type add product in form'''
-    selected_type = None 
+    selected_type = None
 
     if request.method == 'POST':
         form = ProductForm(request.POST)
@@ -104,8 +106,6 @@ def select_product_type(request, category_id, subcategory_id):
     })
 
 
-from django.contrib import messages
-
 @login_required
 def edit_product(request, id):
 
@@ -155,16 +155,24 @@ def edit_product(request, id):
 def delete_product(request, id):
     product = get_object_or_404(Product, id=id, seller=request.user)
 
-    product.delete()
+    '''for delete '''
+    product.is_deleted = True
+
+    product.save()
+
+    # for wishlist
+    Wishlist.objects.filter( product = product).delete()
+
+    messages.success(request,'product deleted successfully!')
+
     return redirect('seller_dashboard')
 
 def product_detail(request, id):
 
-    product = get_object_or_404( 
+    product = get_object_or_404(
         Product,
-        id=id
+        id = id,
+        is_deleted = False
     )
 
     return render(request, 'products/product_detail.html',{'product': product})
-
-

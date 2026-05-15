@@ -12,7 +12,9 @@
 
     {% block extra_css %}{% endblock %}
 </head>
-<body>
+
+<!-- for footer stick to bottom flex-col(vertical layout ) nd min-vh-100 (full screen height) -->
+<body class="d-flex flex-column min-vh-100">
 
     <!-- Navbar -->
     {% include 'includes/navbar.html' %}
@@ -21,7 +23,7 @@
     <div class="container mt-3">
         {% for message in messages %}
 
-            <div class="alert 
+            <div class="alert
                 {% if message.tags == 'error' %}
                     alert-danger
                 {% else %}
@@ -38,11 +40,13 @@
         {% endfor %}
     </div>
     {% endif %}
-    
+
+    <main class="flex-grow-1">
     <div class="container mt-4">
         {% block content %}
         {% endblock %}
     </div>
+    </main>
 
     <!-- Footer -->
     {% include 'includes/footer.html' %}

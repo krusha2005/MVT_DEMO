@@ -51,7 +51,7 @@ from django.contrib import messages
 
 #     if search:
 #         products = products.filter(
-#             Q(name__icontains=search) | 
+#             Q(name__icontains=search) |
 #             Q(seller__seller_profile__store_name__icontains=search ) |
 #             Q(category__name__icontains=search) |
 #             Q(subcategory__name__icontains=search) |
@@ -60,11 +60,11 @@ from django.contrib import messages
 #     # CATEGORY FILTER
 
 #     categories = Category.objects.all()
-    
+
 #     '''ALWAYS fetch all subcategories so the dropdown is populated
 #        We will use JavaScript to hide the ones we don't need'''
-       
-#     subcategories = SubCategory.objects.all() 
+
+#     subcategories = SubCategory.objects.all()
 
 #     # products = Product.objects.all()
 
@@ -135,7 +135,9 @@ def home(request):
     subcategories = SubCategory.objects.all()
     product_types = ProductType.objects.all()
 
-    products = Product.objects.all().order_by('-id')
+    products = Product.objects.filter(
+        is_deleted = False
+    ).order_by('-id')
 
     seller_categories = None
 
@@ -147,9 +149,7 @@ def home(request):
 
             Q(name__icontains=search) |
 
-            Q(
-                seller__seller_profile__store_name__icontains=search
-            ) |
+            Q(seller__seller_profile__store_name__icontains=search) |
 
             Q(category__name__icontains=search) |
 
@@ -200,7 +200,9 @@ def home(request):
             "No matching products found. Showing all products."
         )
 
-        products = Product.objects.all()
+        products = Product.objects.filter(
+            is_deleted = False
+        ).order_by('-id')
 
     # SELLER CATEGORY
     if request.user.is_authenticated:

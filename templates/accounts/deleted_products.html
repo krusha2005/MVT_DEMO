@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %} Deleted Products {% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h4> Deleted Products </h4>
+
+    <div class="row mb-4">
+
+        {% for product in products %}
+
+        <div class="col-md-3 mb-3">
+
+            <div class="card shadow-sm mb-3 p-2">
+
+                <img src="{{ product.images.first.image.url }}" height="270"  style="object-fit: cover;">
+
+
+                    <h5>
+                        {{ product.name }}
+                    </h5>
+
+                    <p> Price: ₹
+                        {{ product.price }}
+                    </p>
+
+                    <p>Stock:
+                        {{ product.stock }}
+                    </p>
+
+                    <p class="text-danger">
+                        De-listed products
+                    </p>
+
+                    <a href="{% url 'deleted_product_buyers' product.id%}" class="btn btn-outline-primary">Buyer</a>
+
+
+            </div>
+
+        </div>
+
+        {% empty %}
+            <h5> No Deleted Products!</h5>
+
+        {% endfor %}
+
+        {% for item in cartitem %}
+
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm mb-3 p-2">
+                <div class="card-body" style="height: 180px;">
+                    <p>
+                        {{ item.product }}
+                    </p>
+
+                    <!-- <p>
+                        {{ item.cart__user}}
+                    </p> -->
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

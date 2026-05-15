@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %} Seller Order Detail {% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="card shadow-sm p-3">
+
+        <h3 class="mb-2">Order Details </h3>
+
+        <h5>OrderID:
+            {{ order.order.order_id }}
+        </h5>
+
+        <hr>
+        <div class="row">
+
+        <div class="col-md-4">
+
+            <img src="{{ order.product.images.first.image.url }}" class="img-fluid rounded" style="object-fit: cover; height: 200px;" >
+
+        </div>
+
+        <div class="col-md-8">
+
+            <h4> {{order.product.name }} </h4>
+
+            <p>Quantity:
+                 {{order.quantity }}
+            </p>
+
+            <p>Price:
+                {{ order.price }}
+            </p>
+
+            <p>Total:
+                 ₹{{ order.total_price }}
+            </p>
+
+            <p>Status:
+                <strong>
+                    {{ order.status }}
+                </strong>
+            </p>
+
+        </div>
+    </div>
+    </div>
+
+    <hr>
+
+    <h4>
+        Buyer Details
+    </h4>
+
+    <p>Name:
+        {{order.order.name}}
+    </p>
+
+    <p>Phone:
+        {{ order.order.phone }}
+    </p>
+
+    <p>Address:
+        {{ order.order.address }}
+    </p>
+
+    <p>City:
+        {{ order.order.city }}
+    </p>
+
+    <p>State:
+        {{ order.order.state }}
+    </p>
+    <hr>
+
+    <h4>
+        Update Status
+    </h4>
+
+    <form method="post" action="{% url 'update_order_status' order.id %}">
+
+        {% csrf_token %}
+        <select name="status" class="form-select mb-3">
+
+            <option value="Pending">
+                pending
+            </option>
+
+            <option value="Packed">
+                packed
+            </option>
+
+            <option value="Shipped">
+                shipped
+            </option>
+
+            <option value="Delivered">
+                delivered
+            </option>
+
+            <option value="Cancelled">
+                cancelled
+            </option>
+
+        </select>
+
+        <button type="submit" class="btn btn-outline-success"> Update Success</button>
+    </form>
+
+</div>
+
+{% endblock %}

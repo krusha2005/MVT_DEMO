@@ -27,7 +27,7 @@ class Category(models.Model):
     def save(self, *args, **kwargs):
         if self.image:
             self.image = compress_image(self.image)
-            
+
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -92,13 +92,15 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.PositiveIntegerField(validators=[MinValueValidator(1),MaxValueValidator(50)], help_text="Stock must be at least 1.",default=1 )
 
+    is_deleted = models.BooleanField( default=False )
+
     created_at = models.DateTimeField(default=timezone.now)
     '''# after change auto_now_Add=true'''
 
     # def save(self, *args, **kwargs):
     #     if self.image:
     #         self.image = compress_image(self.image)
-            
+
     #     super().save(*args, **kwargs)
 
     def __str__(self):
@@ -131,4 +133,3 @@ class ProductImage(models.Model):
             self.image = compress_image(self.image)
 
         super().save(*args, **kwargs)
-

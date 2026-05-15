@@ -5,6 +5,7 @@ from cart.models import CartItem
 from .models import Order, OrderItem
 from products.models import Product
 from django.contrib import messages
+from django.db.models import Q
 
 @login_required
 def checkout(request):
@@ -107,7 +108,7 @@ def place_order(request):
         product.save()
 
         CartItem.objects.filter(cart__user=request.user,product=product).delete()
-        
+
     else:
 
         for item in cart_items:
@@ -129,7 +130,7 @@ def place_order(request):
                 product.save()
 
         cart_items.delete()
- 
+
     return render(request,'orders/checkout.html',
                   {
                     'success': True,
@@ -137,3 +138,79 @@ def place_order(request):
                     'cart_items': [],
                     'total': 0
                 })
+
+@login_required
+def seller_orders(request):
+
+    search=request.GET.get('search')
+
+    '''show only login seller orders list  nd LIFO'''
+    orders=OrderItem.objects.filter(
+        seller=request.user
+    ).order_by('-id')
+
+    # orders=OrderItem.objects.all().order_by('-id')
+
+    '''for search by orderID , product ,buyer name'''
+    if search:
+
+        orders = orders.filter(
+            Q(order__order_id__icontains = search) |
+
+            Q(product__name__icontains = search) |
+
+            Q(order__buyer__username__icontains = search)
+        )
+
+    if not orders.exists():
+
+        messages.warning(request,'No matching orders found! showing all orders')
+
+        orders=OrderItem.objects.filter(
+            seller=request.user
+        ).order_by('-id')
+
+    '''for filter by status'''
+    status_type=request.GET.get('status_type')
+
+    if status_type:
+
+        orders=orders.filter(
+            status = status_type
+        )
+
+    return render(request,'orders/seller_orders.html',{
+        'orders':orders,
+    })
+
+
+@login_required
+def seller_order_detail(request,id):
+
+    '''for 1 order only for detail'''
+    order = get_object_or_404(
+        OrderItem,
+        id=id,
+        seller=request.user
+    )
+
+    return render(request,'orders/seller_order_detail.html',{
+        'order':order
+    })
+
+
+@login_required
+def update_order_status(request,id):
+
+    order = get_object_or_404(
+        OrderItem,
+        id=id,
+        seller=request.user
+    )
+
+    if request.method == 'POST':
+        status = request.POST.get('status')
+        order.status = status
+        order.save()
+
+    return redirect('seller_order_detail',id=order.id)

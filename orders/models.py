@@ -19,15 +19,23 @@ class Order(models.Model):
 
     def __str__(self):
         return self.order_id
-    
+
 class OrderItem(models.Model):
 
+    STATUS_CHOICES = (
+        ( 'Pending', 'pending' ),
+        ( 'Packed', 'packed' ),
+        ( 'Shipped', 'shipped' ),
+        ( 'Delivered', 'delivered' ),
+        ( 'Cancelled', 'cancelled' )
+    )
     order = models.ForeignKey(Order,on_delete=models.CASCADE,related_name='items')
     product = models.ForeignKey( Product,on_delete=models.CASCADE)
     seller = models.ForeignKey( settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
     price = models.DecimalField( max_digits=10, decimal_places=2)
     total_price = models.DecimalField( max_digits=10,decimal_places=2)
+    status = models.CharField( max_length=20 , default='Pending', choices=STATUS_CHOICES)
 
     def __str__(self):
         return self.product.name
