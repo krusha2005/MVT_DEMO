@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %} Buyer_Order_Detail {% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="card shadow-sm p-3">
+
+        <h2 class="mb-3">Order Details</h2>
+
+        <h4 class="mb-3"> OrderID: {{ order.order.order_id }}</h4>
+        <hr>
+
+        <div class="row mb-3">
+            <div class="col-md-4">
+                
+                <img src="{{ order.product.images.first.image.url }}"  style="object-fit: cover; height: 230px;" class="img-fluid rounded">
+
+            </div>
+
+            <div class="col-md-8 ">
+                <h4>{{ order.product.name }}</h4>
+
+                <p>Quantity:
+                    {{ order.quantity}}
+                </p>
+
+                <p>Price:
+                    {{ order.price }}
+                </p>
+
+                <p>Total: ₹
+                    {{ order.total_price }}
+                </p>
+
+                <p>Status:
+                    <strong>
+                    {{ order.status }}
+                    </strong>
+                </p>
+
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="card shadow-sm p-3">
+
+    <h4> Buyer Details </h4>
+
+    <p>Name: 
+        {{ order.order.name }}
+    </p>
+
+    <p>Phone:
+        {{ order.order.phone }}
+    </p>
+
+    <p>Address:
+        {{ order.order.address }}
+    </p>
+
+    <p>City:
+        {{ order.order.city }}
+    </p>
+
+    <p>State:
+        {{ order.order.state }}
+    </p>
+
+    </div>
+</div>
+{% endblock %}

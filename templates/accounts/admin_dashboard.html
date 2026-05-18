@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %} Admin Dashboard {% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2 class="mb-3">Admin Dashboard</h2>
+
+    <div class="row mb-2">
+
+        <div class="col-md-3">
+            <div class="card shadow-sm p-2 bg-light">
+                <h5>Total Sellers</h5>
+                <h2>{{total_Seller}}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-3 ">
+            <div class="card shadow-sm p-2 bg-light">
+                <h5>Total Buyers</h5>
+                <h2>{{ total_buyer}}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm p-2 bg-light">
+                <h5>Total Products</h5>
+                <h2>{{total_products}}</h2>
+            </div>
+        </div>
+
+        
+    </div>
+</div>
+{% endblock %}
