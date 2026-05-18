@@ -214,3 +214,82 @@ def update_order_status(request,id):
         order.save()
 
     return redirect('seller_order_detail',id=order.id)
+
+
+
+@login_required
+def buyer_dashboard(request):
+
+    total_orders = Order.objects.filter(
+        buyer=request.user
+    ).count()
+
+    pending_orders = OrderItem.objects.filter(
+        order__buyer=request.user,
+        status='Pending'
+    ).count()
+
+    delivered_orders = OrderItem.objects.filter(
+        order__buyer=request.user,
+        status='Delivered'
+    ).count()
+
+    cart_items = CartItem.objects.filter(
+        cart__user=request.user
+    ).count()
+
+    current_orders = OrderItem.objects.filter(
+        order__buyer=request.user
+    ).order_by('-id')
+
+    search = request.GET.get('search')
+
+    if search:
+
+        current_orders = current_orders.filter(
+
+            Q( order__order_id__icontains = search) |
+
+            Q( product__name__icontains = search) |
+
+            Q( status__icontains = search)
+        )
+
+    return render(
+        request,
+        'orders/buyer_dashboard.html',
+        {
+
+            'total_orders': total_orders,
+
+            'pending_orders': pending_orders,
+
+            'delivered_orders': delivered_orders,
+
+            'cart_items': cart_items,
+
+            'current_orders': current_orders
+        }
+    )
+
+
+
+@login_required
+def buyer_order_detail(request,id):
+
+    order = get_object_or_404(
+
+        OrderItem,
+
+        id=id,
+
+        order__buyer=request.user
+    )
+
+    return render(
+        request,
+        'orders/buyer_order_detail.html',
+        {
+            'order': order
+        }
+    )

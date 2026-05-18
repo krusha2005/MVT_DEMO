@@ -8,4 +8,6 @@ urlpatterns=[
     path('seller/orders/',views.seller_orders, name='seller_orders'),
     path('seller/order/<int:id>/',views.seller_order_detail, name='seller_order_detail'),
     path('seller/order/status/<int:id>/',views.update_order_status, name='update_order_status'),
+    path('buyer/dashboard/', views.buyer_dashboard,name='buyer_dashboard'),
+    path('buyer/buyer_order-details/<int:id>/',views.buyer_order_detail,name='buyer_order_details'),
 ]
