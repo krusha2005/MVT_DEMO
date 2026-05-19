@@ -9,7 +9,7 @@
     <form method="GET" class="row mb-4" id="search-form">
 
         <!-- Search -->
-        <div class="col-md-3">
+        <div class="col-md-2">
             <input type="text" name="search" class="form-control" placeholder="Search products">
         </div>
 
@@ -70,8 +70,11 @@
         <!-- Button -->
         <div class="col-md-1">
             <button class="btn btn-outline-primary w-100" id="search-btn">Search</button>
-        </div>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
-
+            
+        </div>                                                
+        <div class="col-md-1">
+            <a href="{% url 'home' %}" class="btn btn-outline-danger">X</a>
+        </div>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
     </form>
 
     <!-- CATEGORY SECTION -->
@@ -90,21 +93,100 @@
         {% endfor %}
     </div>
 
+
+    <!-- best seller section  -->
+   <h3 class="mt-5 mb-3">Products</h3>
+
+   {% if not request.GET.search and not request.GET.category and not request.GET.subcategory and not request.GET.product_type and not request.GET.min_price and not request.GET.max_price %}
+
+        <div class="row">
+            {% for product in best_sellers %}
+
+                {% if user.role == 'buyer' %}
+
+                    <div class="col-md-3 mb-4">
+
+                        <a href="{% url 'product_detail' product.id %}" class="text-decoration-none text-dark">
+                        <div class="card shadow-sm p-2" style="height: 500px;">
+                            <img src="{{ product.images.first.image.url }}" height="250" style="object-fit: cover;" >
+
+                            <div class="mt-2">
+                                    <span class="badge bg-warning text-dark mb-2">Best Seller</span>
+
+                                    <h6>{{ product.name }}</h6>
+
+                                    <!-- Store Name -->
+                                    <p class="text-muted mb-1">
+                                        Store:
+                                        <strong>
+                                            {{ product.seller.seller_profile.store_name }}
+                                        </strong>
+                                    </p>
+
+                                    <small class="text-muted">
+                                        {{ product.category.name }} / {{ product.subcategory.name }}
+                                    </small>
+
+                                    <p class="mt-1">{{ product.description|truncatewords:8 }}</p>
+
+                                    <strong>₹{{ product.price }}</strong>
+                            </div>
+                        </div>
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="col-md-3 mb-4">
+
+                        <div class="card shadow-sm p-2" style="height: 500px;">
+                            <img src="{{ product.images.first.image.url }}" height="250" style="object-fit: cover;" >
+
+                            <div class="mt-2">
+                                    <span class="badge bg-warning text-dark mb-2">Best Seller </span>
+
+                                    <h6>{{ product.name }}</h6>
+
+                                    <!-- Store Name -->
+                                    <p class="text-muted mb-1">
+                                        Store:
+                                        <strong>
+                                            {{ product.seller.seller_profile.store_name }}
+                                        </strong>
+                                    </p>
+
+                                    <small class="text-muted">
+                                        {{ product.category.name }} / {{ product.subcategory.name }}
+                                    </small>
+
+                                    <p class="mt-1">{{ product.description|truncatewords:8 }}</p>
+
+                                    <strong>₹{{ product.price }}</strong>
+                            </div>
+                        </div>
+                    
+                    </div>
+
+                {% endif %}
+            {% endfor %}
+        </div>
+
+    {% endif %}
+
     <!-- PRODUCT SECTION -->
-    <h3 class="mt-5 mb-3">Products</h3>
-
+       
     <div class="row">
+        
         {% for product in products %}
-
+           
             {% if user.role == 'buyer' %}
             <!-- if user is buyer then he can buy nd show there detail -->
+
                 <div class="col-md-3 mb-4">
                     <a href="{% url 'product_detail' product.id %}" class="text-decoration-none text-dark">
-                    <div class="card shadow-sm p-2">
+                    <div class="card shadow-sm p-2" style="height: 470px;">
 
                         <!-- Product Image -->
                         {% if product.images.all %}
-                            <img src="{{ product.images.first.image.url }}" height="200" style="object-fit:cover;">
+                            <img src="{{ product.images.first.image.url }}" height="250" style="object-fit:cover;">
                         {% endif %}
 
                         <div class="mt-2">
@@ -133,11 +215,11 @@
             {% else %}
             <!-- if user is not buyer then he can not show product detail nd buy -->
                 <div class="col-md-3 mb-4">
-                    <div class="card shadow-sm p-2">
+                    <div class="card shadow-sm p-2" style="height: 470px;">
 
                         <!-- Product Image -->
                         {% if product.images.all %}
-                            <img src="{{ product.images.first.image.url }}" height="200" style="object-fit:cover;">
+                            <img src="{{ product.images.first.image.url }}" height="250" style="object-fit:cover;">
                         {% endif %}
 
                         <div class="mt-2">

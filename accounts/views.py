@@ -3,9 +3,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import SellerProfile, User
 from .forms import LoginForm, BuyerRegisterForm, SellerRegisterForm
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from products.models import Product
-from orders.models import OrderItem
+from orders.models import OrderItem, Order
 from cart.models import CartItem
 
 
@@ -44,9 +44,11 @@ def user_login(request):
             login(request, user)
 
             # 🔥 role-based redirect
-            if user.role == 'buyer':
-                return redirect('home')
+            if user.is_superuser:
+                return redirect('admin_dashboard')
             elif user.role == 'seller':
+                return redirect('home')
+            else:
                 return redirect('home')
 
         else:
@@ -205,3 +207,117 @@ def deleted_product_buyers(request ,id):
         'product' : product,
         'cart_items' : cart_items
     })
+
+def admin_required(user):
+    return user.is_superuser
+
+
+@login_required
+@user_passes_test(admin_required)
+def admin_dashboard(request):
+
+    total_seller = SellerProfile.objects.filter(
+        user__role = 'seller'
+    ).count()
+
+    total_buyer = User.objects.filter(
+        role = 'buyer'
+    ).count()
+
+    total_products = Product.objects.filter(
+        is_deleted= False
+    ).count()
+
+    total_orders =Order.objects.count()
+
+    sellers = SellerProfile.objects.select_related(
+        'user'
+    ).order_by('-id')
+
+    buyers = User.objects.filter(
+        role = 'buyer'
+    ).order_by('-id')
+
+    return render(request,'accounts/admin_dashboard.html',{
+        'total_seller' : total_seller , 
+        'total_buyer' : total_buyer,
+        'total_products' : total_products,
+        'total_orders' : total_orders,
+        'sellers' : sellers,
+        'buyers' : buyers
+    })
+
+
+@login_required
+@user_passes_test(admin_required)
+def admin_seller_detail(request,id):
+
+    seller = get_object_or_404(
+        SellerProfile,
+        id =id
+    )
+
+    products = Product.objects.filter(
+        seller = seller.user,
+        is_deleted = False
+    )
+
+    return render(request,'accounts/admin_seller_detail.html',{
+        'seller' : seller,
+        'products' : products
+    })
+
+@login_required
+@user_passes_test(admin_required)
+def admin_buyer_detail(request,id):
+
+    buyer = get_object_or_404(
+        User,
+        role = 'buyer',
+        id=id
+    )
+
+    order = OrderItem.objects.filter(
+        order__buyer=buyer,   
+        # left side must be actual model field nd right side actual python  object/value 
+
+    )
+
+    return render(request,'accounts/admin_buyer_detail.html',{
+        'buyer': buyer,
+        'orders':order
+
+    })
+
+@login_required
+@user_passes_test(admin_required)
+def delete_seller(request,id):
+
+    seller = get_object_or_404(
+        SellerProfile,
+        id=id
+    )
+
+    seller.user.delete()
+
+    messages.success(request ,'seller deleted successfully!')
+
+    return redirect('admin_dashboard')
+
+
+@login_required
+@user_passes_test(admin_required)
+
+def delete_buyer(request,id):
+
+    buyer = get_object_or_404(
+        User,
+        role = 'buyer',
+        id=id
+    )
+
+    buyer.delete()
+
+    messages.success(request,'buyer deleted successfully!')
+
+    return redirect('admin_dashboard')

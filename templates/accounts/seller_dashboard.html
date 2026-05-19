@@ -111,7 +111,7 @@
 
                     <!-- ✅ Product Image -->
                     {% if product.images.all %}
-                        <img src="{{ product.images.first.image.url }}" height="200" style="object-fit: fill;">
+                        <img src="{{ product.images.first.image.url }}" height="200" style="object-fit: cover;">
 
                     {% else %}
                         <p>No Image</p>

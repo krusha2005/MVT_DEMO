@@ -49,30 +49,6 @@ class SubCategory(models.Model):
         return self.name
 
 
-# class Product(models.Model):
-#     seller = models.ForeignKey('accounts.SellerProfile', on_delete=models.CASCADE)
-
-#     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
-#     subcategory = models.ForeignKey(SubCategory, on_delete=models.SET_NULL, null=True)
-
-#     name = models.CharField(max_length=200)
-#     price = models.DecimalField(max_digits=10, decimal_places=2)
-
-#     image = models.ImageField(upload_to='products/')
-
-#     def save(self, *args, **kwargs):
-#         super().save(*args, **kwargs)
-
-#         if self.image:
-#             self.image.save(
-#                 self.image.name,
-#                 compress_image(self.image),
-#                 save=False
-#             )
-
-#         super().save(*args, **kwargs)
-
-
 class Product(models.Model):
     seller = models.ForeignKey(
         settings.AUTH_USER_MODEL,

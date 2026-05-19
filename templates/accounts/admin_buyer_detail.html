@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Buyer Detail {% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2>Buyer Detail</h2>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <div class="card shadow-sm p-2">
+
+                <h5>{{ buyer.username }}</h5>
+
+                <p>Email:
+                    {{ buyer.email }}
+                </p>
+
+                <p>Phone:
+                    {{ buyer.phone }}
+                </p>
+
+                <p>City:
+                    {{ buyer.city }}
+                </p>
+
+                <p>State:
+                    {{ buyer.state }}
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <div class="card shadow-sm p-2">
+
+                <h5 class="mb-2 mt-3">Total Orders:
+                    {{ buyer.orders.count }}
+                </h5>
+
+                <h5 class="mb-3 mt-3">Cart Items :
+                    {{ buyer.cart_set.first.items.count }}
+                    <!-- this cart_set is djnago creates automatically reverse rel using modelname_set so without related_name use cart_set -->
+                </h5>
+
+                <h5 class="mb-3 mt-3">Wishlist:
+                    {{ buyer.wishlist_set.count}}
+                </h5>
+            </div>
+        </div>
+    </div>
+
+    <!-- order history -->
+     <div class="mb-3">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>OrderID</th>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>price</th>
+                    <th>status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for item in orders %}
+
+                    <tr>
+                        <td>{{ item.order.order_id}} </td>
+                        <td>{{ item.product.name }} </td>
+                        <td>{{ item.quantity }} </td>
+                        <td>{{ item.price }} </td>
+                        <td> {{ item.status }} </td>
+                    </tr>
+
+                {% empty %}
+                    <td colspan="5">Order Not Found!</td>
+                {% endfor %}
+            </tbody>
+        </table>
+     </div>
+</div>
+{% endblock %}

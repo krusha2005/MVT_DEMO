@@ -7,12 +7,12 @@
 
     <h2 class="mb-3">Admin Dashboard</h2>
 
-    <div class="row mb-2">
+    <div class="row mb-4">
 
         <div class="col-md-3">
             <div class="card shadow-sm p-2 bg-light">
                 <h5>Total Sellers</h5>
-                <h2>{{total_Seller}}</h2>
+                <h2>{{total_seller}}</h2>
             </div>
         </div>
 
@@ -30,7 +30,83 @@
             </div>
         </div>
 
-        
+        <div class="col-md-3">
+            <div class="card shadow-sm p-2 bg-light">
+                <h5>Total Orders</h5>
+                <h2>{{ total_orders }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm p-2 mb-4">
+
+        <h5>Manage Seller</h5>
+
+        <table class="table table-striped">
+
+            <thead>
+                <tr>
+                    <th>Seller</th>
+
+                    <th>Store</th>
+
+                    <th>Category</th>
+
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for seller in sellers %}
+                <tr>
+                    <td>{{ seller.user.username}}</td>
+
+                    <td>{{ seller.store_name }}</td>
+
+                    <td>
+                        {% for category in seller.categories.all %}
+                          {{ category.name }},
+                        {% endfor %}
+                    </td>
+
+                    <td>
+                        <a class="btn btn-outline-primary" href="{% url 'admin_seller_detail' seller.id %}">View</a>
+                        <a class="btn btn-outline-danger" href="{% url 'delete_seller' seller.id %}">Delete</a>
+                    </td>
+                </tr>
+
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card shadow-sm p-2">
+
+        <h5>Manage Buyer</h5>
+
+        <table class="table table-striped">
+
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Orders</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for buyer in buyers %}
+                    <tr>
+                        <td>{{ buyer.username}}</td>
+                        <td>{{ buyer.email}}</td>
+                        <td>{{ buyer.orders.count }}</td>
+                        <td>
+                            <a href="{% url 'admin_buyer_detail' buyer.id %}" class="btn btn-outline-primary">View</a>
+                            <a href="{% url 'delete_buyer' buyer.id %}" class="btn btn-outline-danger">Delete</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 {% endblock %}

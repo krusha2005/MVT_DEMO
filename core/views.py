@@ -18,6 +18,7 @@ from products.models import Product, Category, SubCategory, ProductType
 from accounts.models import SellerProfile
 from django.db.models import Q
 from django.contrib import messages
+from django.db.models import Count
 
 # def home(request):
 #     user = request.user
@@ -162,7 +163,7 @@ def home(request):
     # FILTERS
     cat_id = request.GET.get('category')
     sub_id = request.GET.get('subcategory')
-    product_type = request.GET.get('product_type')
+    product_type_id = request.GET.get('product_type')
 
     if cat_id:
         products = products.filter(
@@ -174,9 +175,9 @@ def home(request):
             subcategory_id=sub_id
         )
 
-    if product_type:
+    if product_type_id:
         products = products.filter(
-            product_type_id=product_type
+            product_type_id=product_type_id
         )
 
     # PRICE FILTER
@@ -204,6 +205,7 @@ def home(request):
             is_deleted = False
         ).order_by('-id')
 
+
     # SELLER CATEGORY
     if request.user.is_authenticated:
 
@@ -215,6 +217,15 @@ def home(request):
                 user.seller_profile.categories.all()
             )
 
+    best_seller = Product.objects.filter(
+        orderitem__status = 'Delivered'
+    ).annotate(total_sold = Count('orderitem')).order_by('-total_sold')[:4]
+
+    if not ( search or cat_id or sub_id or product_type_id or min_price or max_price ):
+        products = products.exclude(
+            id__in=best_seller.values_list('id', flat=True)
+        )
+
     return render(request, 'home.html', {
 
         'categories': categories,
@@ -222,5 +233,5 @@ def home(request):
         'product_types': product_types,
         'products': products,
         'seller_categories': seller_categories,
-
+        'best_sellers' : best_seller 
     })
