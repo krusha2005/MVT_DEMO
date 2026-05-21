@@ -51,8 +51,6 @@ def user_login(request):
             else:
                 return redirect('home')
 
-        else:
-            messages.error(request, "Invalid username or password")  # ✅
 
     else:
         form = LoginForm()
@@ -260,7 +258,7 @@ def admin_seller_detail(request,id):
     products = Product.objects.filter(
         seller = seller.user,
         is_deleted = False
-    )
+    ).order_by('-id')
 
     return render(request,'accounts/admin_seller_detail.html',{
         'seller' : seller,
@@ -281,7 +279,7 @@ def admin_buyer_detail(request,id):
         order__buyer=buyer,   
         # left side must be actual model field nd right side actual python  object/value 
 
-    )
+    ).order_by('-id')
 
     return render(request,'accounts/admin_buyer_detail.html',{
         'buyer': buyer,
