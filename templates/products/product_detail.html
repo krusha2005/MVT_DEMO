@@ -7,7 +7,7 @@
 
         <!-- MAIN IMAGE -->
         <div class="col-md-5">
-            {% if product.images.first %}
+            {% if product.images.all %}
 
                 <img id="main-image"
                     src="{{ product.images.first.image.url }}"

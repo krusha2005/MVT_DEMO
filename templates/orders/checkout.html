@@ -17,43 +17,41 @@
                         <!-- for buy now checkout page (in this buyer can also inc nd dec quantity ) -->
 
                         <div class="d-flex align-items-center mb-3">
-
                             <img src="{{buy_product.images.first.image.url }}", width="100", height="100", class="img-fluid" style="object-fit: cover;">
-
                             <div class="ms-3">
-
                                 <h5>{{buy_product.name}}</h5>
-                                <p>Quantity:1</p>
-                                <strong> ₹{{buy_product.price}}</strong>
-
+                                <p>{{buy_product.total_price}}</p>
+                                <!-- <p>Total:
+                                <strong id="totalPrice"> ₹{{buy_product.price}}</strong>
+                                </p> -->
                             </div>
                         </div>
-
                     {% else %}
-                        <!-- for cart checkout page -->
 
+                        <!-- for cart checkout page -->
                         {% for item in cart_items %}
                         <div class="d-flex align-items-center mb-3">
-
                             <img src="{{item.product.images.first.image.url}}", width="100", height="100", class="img-fluid" style="object-fit: cover;">
-
                             <div class="ms-3">
-
                                 <h5>{{item.product.name}}</h5>
-
                                 <p>Quantity: 
                                     {{ item.quantity }} 
                                 </p>
-
-                                <strong> ₹{{item.product.price}}</strong>
-
+                                <p>Price:
+                                <strong > ₹{{item.product.price}}</strong>
+                                </p>
                             </div>
                         </div>
                         {% endfor %}
-
+                            <h5 class="mt-3 ms-2">Total:  ₹{{ total }}</h5>
                     {% endif %}
-
-                    <h5 class="mt-3 ms-2">Total:  ₹{{ total }}</h5>
+                        
+                    {% if buy_product %}
+                        <h5 class="mt-3 ms-2">Total:
+                            <span id="totalPrice">₹{{buy_product.price}}</span>
+                        </h5>
+                    {% endif %}
+                    
                 </div>
             </div>
 
@@ -66,6 +64,7 @@
                         {% csrf_token %}
 
                         <input type="hidden" name="buy_product_id" value="{{ buy_product.id }}">
+                        <input type="hidden" id="productPrice" value="{{buy_product.price}}">
 
                         <div class="mb-3">
                             <label class="form-label">Name:</label>
@@ -75,13 +74,11 @@
                         <div class="mb-3">
                             <label class="form-label">Phone:</label>
                             <input type="text" name="phone" maxlength="10" class="form-control" required value="{{request.POST.phone}}">
-
                             {% if phone_error %}
                                 <small class="text-danger">
                                     {{phone_error}}
                                 </small>
                             {% endif %}
-
                         </div>
 
                         <div class="mb-3">
@@ -94,12 +91,19 @@
                                 <label class="form-label">City:</label>
                                 <input type="text" class="form-control" required name="city">
                             </div>
-                            
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">State:</label>
                                 <input class="form-control" type="text" name="state" required>
                             </div>
                         </div>
+
+                        {% if buy_product %}
+                            <div class="d-flex align-items-center gap-2 ms-3">
+                                <button onclick="decreaseQty()" type="button" class="btn btn-outline-primary btn-sm">-</button>
+                                <input type="number" id="qty" name="quantity" value="1" min="1" max="{{ buy_product.stock }}">
+                                <button type="button" onclick="increaseQty()" class="btn btn-outline-primary btn-sm">+</button>
+                            </div>
+                        {% endif %}
 
                         <div class="mt-4 gap-3 mb-1 ms-2 align-items-center">
                             <button type="submit" class="btn btn-outline-success">Place Order</button>
@@ -122,17 +126,16 @@
                                         <h4>Thank You For Shopping!</h4>
                                         <p>Your order has been placed successfully.</p>
                                         {% if order %}
-                                            <h5>Order ID:{{order.order_id}}</h5>
+                                            <h5>Order ID:{{order.order_id}} </h5>
                                             <h5>Payment:  ₹{{order.total_amount}}</h5>
                                         {% endif %}
-
                                     </div>
 
                                     <div class="modal-footer">
                                         <a href="/" class="btn btn-outline-success">Continue Shopping</a>
                                     </div>
                                 </div>
-                            </div>
+                            </div>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
                         </div>
 
                     </form>
@@ -146,17 +149,50 @@
 
 
 {% if success %}
-
 <script>
 
     var myModal = new bootstrap.Modal(
         document.getElementById('successModal')
     );
-
     myModal.show();
 
 </script>
-
 {% endif %}
+
+<script>
+    function updateTotal(){
+        let qty = parseInt(
+            document.getElementById('qty').value
+        )
+        let price = parseInt(
+            document.getElementById('productPrice').value
+        )
+        let total = qty*price
+        document.getElementById('totalPrice').innerHTML="₹" + total
+    }
+
+    function increaseQty(){
+        let qty = document.getElementById('qty')
+        let stock = parseInt( qty.max )
+
+        if (parseInt(qty.value)< stock && parseInt(qty.value) < 5){
+        qty.value = parseInt(qty.value) + 1
+        }
+        else{
+            alert("stock limit reach or not more than 5!")
+        }
+        updateTotal()
+    }
+
+    function decreaseQty(){
+        let qty = document.getElementById('qty')
+        if (parseInt(qty.value)>1){
+            qty.value = parseInt(qty.value) - 1
+        }
+        updateTotal()
+    }
+</script>
+
+
 
 {% endblock %}

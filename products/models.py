@@ -20,8 +20,8 @@ class Category(models.Model):
     image = models.ImageField(
         upload_to='categories/',
         validators=[validate_image],
-        null=True,
-        blank=True
+        # null=True,
+        # blank=True
     )
 
     def save(self, *args, **kwargs):
@@ -42,7 +42,6 @@ class SubCategory(models.Model):
     def save(self, *args, **kwargs):
         if self.image:
             self.image = compress_image(self.image)
-
         super().save(*args, **kwargs)
 
     def __str__(self):

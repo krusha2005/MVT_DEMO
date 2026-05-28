@@ -23,8 +23,13 @@ def add_to_wishlist(request,id):
 @login_required
 def wishlist(request):
 
-    wishlist_items=Wishlist.objects.filter(
-        user=request.user
+    wishlist_items=Wishlist.objects.select_related(
+        'product',
+        'product__seller',
+        'product__product_type'
+    ).prefetch_related('product__images'
+    ).filter(
+        user = request.user
     )
 
     return render(request,'wishlist/wishlist.html',{'wishlist_items':wishlist_items})

@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'orders',
     'products',
     'wishlist',
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
@@ -57,6 +58,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -89,16 +91,6 @@ WSGI_APPLICATION = 'config.wsgi.application'
 #     }
 # }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'marketplace_db',
-#         'USER': 'postgres',
-#         'PASSWORD': 'MVT_db2011',
-#         'HOST': 'localhost',
-#         'PORT': '5432',
-#     }
-# }
 
 # DATABASES = {
 #     'default': {
@@ -166,3 +158,17 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
+
+# INTERNAL_IPS = [
+#     "127.0.0.1",
+#     "0.0.0.0",
+# ]
+
+
+import socket
+
+hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
+
+INTERNAL_IPS = [
+    ip[: ip.rfind(".")] + ".1" for ip in ips
+] + ["127.0.0.1"]

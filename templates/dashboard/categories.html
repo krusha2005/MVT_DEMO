@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %} Admin Category {% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center">
+         <h2>Category</h2>
+         <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#categoryModal">
+            <strong> + </strong> Add Category</a>
+         </button>
+    </div>
+
+    <hr>
+
+    <div class="row mb-2">
+        {% for cat in categories %}
+        <div class="col-md-3 mb-2">
+            <div class="card shadow-sm p-2">
+
+                <img src="{{ cat.image.url }}" style="object-fit: cover; height: 250px;">
+                <h5 class="mt-2">{{ cat.name }}</h5>
+
+                <div class="d-flex gap-2 ">
+                    <a class="btn btn-outline-primary w-100" href="{% url 'subcategory_list' cat.id %}">View</a>
+                    <a class="btn btn-outline-warning w-100" href="?edit={{ cat.id }}" >Edit</a>
+                    <a class="btn btn-outline-danger w-100" href="{% url 'delete_category' cat.id %}">Delete</a>
+                </div>
+            </div>
+        </div>
+        {% endfor%}
+    </div>
+
+    <div class="modal fade" id="categoryModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+
+                    <div class="modal-title text-success " style="font-size:x-large; font-weight: 500;"> Add Category</div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+                </div>
+                
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    {% if edit_id %}
+                    <input type="hidden" value="{{ edit_id }}" name="edit_id">
+                    {% endif %}
+
+                    <div class="modal-body">
+                        {{ category_form.as_p }}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-outline-success">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% if edit_id %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var myModal = new bootstrap.Modal(
+            document.getElementById('categoryModal')
+        );
+        myModal.show();
+    });
+</script>
+
+{% endif %}
+{% endblock %}

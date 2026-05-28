@@ -11,7 +11,7 @@
                 <a href="{% url 'select_product_type' category.id sub.id %}" style="text-decoration: none;">
                     <div class="card p-2 text-center">
                         {% if sub.image %}
-                            <img src="{{ sub.image.url }}" height="180" style="object-fit: fill;">
+                            <img src="{{ sub.image.url }}" height="180" style="object-fit: cover;">
                         {% endif %}
                         <h5 class="p-1">{{ sub.name }}</h5>
                     </div>

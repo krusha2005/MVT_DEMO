@@ -5,7 +5,7 @@ from cart.models import CartItem
 from .models import Order, OrderItem
 from products.models import Product
 from django.contrib import messages
-from django.db.models import Q
+from django.db.models import Q, Count
 
 @login_required
 def checkout(request):
@@ -14,8 +14,23 @@ def checkout(request):
     )
 
     total=0
+    out_of_stock_products=[]
     for item in cart_items:
         total+= item.product.price * item.quantity
+
+        product = item.product
+        if product.stock < item.quantity:
+            out_of_stock_products.append(item)
+
+    # if out_of_stock_products:
+    #     for product in out_of_stock_products:
+    #         product.delete()
+    #     messages.error(request,f"{' ,'.join([item.product.name for item in out_of_stock_products])} are out of stock!")
+    #     return redirect('cart')
+
+    if out_of_stock_products:
+        messages.error(request,'please remove out-of-stock products!')
+        return redirect('cart')
 
     return render(request,'orders/checkout.html',{
         'cart_items':cart_items,
@@ -23,7 +38,7 @@ def checkout(request):
     })
 
 @login_required
-def buy_now(request,id):
+def buy_now(request,id): 
 
     product=get_object_or_404(
         Product,
@@ -47,7 +62,9 @@ def buy_now(request,id):
 @login_required
 def place_order(request):
 
-    cart_items=CartItem.objects.filter(
+    cart_items=CartItem.objects.select_related(
+        'product'
+    ).filter(
         cart__user=request.user
     )
 
@@ -74,49 +91,63 @@ def place_order(request):
             'state': state,
         })
 
-    order= Order.objects.create(
-        buyer=request.user,
-        order_id=f"ORD{random.randint(1000,9999)}",
-        total_amount=total,
-        message="your order has been placed successfully!",
-
-        name=name,
-        phone=phone,
-        address=address,
-        city=city,
-        state=state
-
-    )
-
     if buy_product_id:
 
         product=get_object_or_404(
             Product,
             id=buy_product_id
         )
+        buy_quantity = int(request.POST.get('quantity',1))
+
+        buy_total = product.price * buy_quantity
+
+        order= Order.objects.create(
+            buyer=request.user,
+            order_id=f"ORD{random.randint(1000,9999)}",
+            total_amount=buy_total,
+            message="your order has been placed successfully!",
+
+            name=name,
+            phone=phone,
+            address=address,
+            city=city,
+            state=state
+        )
 
         OrderItem.objects.create(
             order=order,
             product=product,
             seller=product.seller,
-            quantity=1,
+            quantity=buy_quantity,
             price=product.price,
-            total_price=product.price
+            total_price=buy_total
         )
 
-        product.stock -= 1
+        product.stock -= buy_quantity
         product.save()
 
         CartItem.objects.filter(cart__user=request.user,product=product).delete()
 
     else:
 
+        order= Order.objects.create(
+            buyer=request.user,
+            order_id=f"ORD{random.randint(1000,9999)}",
+            total_amount=total,
+            message="your order has been placed successfully!",
+
+            name=name,
+            phone=phone,
+            address=address,
+            city=city,
+            state=state
+        )
+
         for item in cart_items:
             product = item.product
 
             if product.stock >= item.quantity:
                 OrderItem.objects.create(
-
                     order=order,
                     product=product,
                     seller=product.seller,
@@ -124,7 +155,6 @@ def place_order(request):
                     price=product.price,
                     total_price=product.price * item.quantity
                 )
-
                 # UPDATE STOCK
                 product.stock -= item.quantity
                 product.save()
@@ -139,13 +169,17 @@ def place_order(request):
                     'total': 0
                 })
 
+
 @login_required
 def seller_orders(request):
 
     search=request.GET.get('search')
 
     '''show only login seller orders list  nd LIFO'''
-    orders=OrderItem.objects.filter(
+    orders=OrderItem.objects.select_related(
+        'order',
+        'product'
+    ).filter(
         seller=request.user
     ).order_by('-id')
 
@@ -153,17 +187,13 @@ def seller_orders(request):
 
     '''for search by orderID , product ,buyer name'''
     if search:
-
         orders = orders.filter(
             Q(order__order_id__icontains = search) |
-
             Q(product__name__icontains = search) |
-
             Q(order__buyer__username__icontains = search)
         )
 
     if not orders.exists():
-
         messages.warning(request,'No matching orders found! showing all orders')
 
         orders=OrderItem.objects.filter(
@@ -174,7 +204,6 @@ def seller_orders(request):
     status_type=request.GET.get('status_type')
 
     if status_type:
-
         orders=orders.filter(
             status = status_type
         )
@@ -224,21 +253,21 @@ def buyer_dashboard(request):
         buyer=request.user
     ).count()
 
-    pending_orders = OrderItem.objects.filter(
-        order__buyer=request.user,
-        status='Pending'
-    ).count()
-
-    delivered_orders = OrderItem.objects.filter(
-        order__buyer=request.user,
-        status='Delivered'
-    ).count()
+    order_item_stats = OrderItem.objects.filter(
+        order__buyer = request.user
+    ).aggregate(
+        pending_orders = Count('id', filter= Q(status = 'Pending')),
+        delivered_orders = Count('id', filter= Q( status = 'Delivered'))
+    )
 
     cart_items = CartItem.objects.filter(
         cart__user=request.user
     ).count()
 
-    current_orders = OrderItem.objects.filter(
+    current_orders = OrderItem.objects.select_related(
+        'product',
+        'order'
+    ).filter(
         order__buyer=request.user
     ).order_by('-id')
 
@@ -247,11 +276,8 @@ def buyer_dashboard(request):
     if search:
 
         current_orders = current_orders.filter(
-
             Q( order__order_id__icontains = search) |
-
             Q( product__name__icontains = search) |
-
             Q( status__icontains = search)
         )
 
@@ -259,36 +285,27 @@ def buyer_dashboard(request):
         request,
         'orders/buyer_dashboard.html',
         {
-
             'total_orders': total_orders,
-
-            'pending_orders': pending_orders,
-
-            'delivered_orders': delivered_orders,
-
+            'pending_orders': order_item_stats['pending_orders'],
+            'delivered_orders': order_item_stats['delivered_orders'],
             'cart_items': cart_items,
-
             'current_orders': current_orders
         }
     )
-
-
 
 @login_required
 def buyer_order_detail(request,id):
 
     order = get_object_or_404(
-
-        OrderItem,
-
+        OrderItem.objects.select_related(
+            'order',
+            'product'
+        ),
         id=id,
-
         order__buyer=request.user
     )
 
-    return render(
-        request,
-        'orders/buyer_order_detail.html',
+    return render(request,'orders/buyer_order_detail.html',
         {
             'order': order
         }

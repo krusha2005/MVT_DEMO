@@ -4,16 +4,24 @@ from accounts.models import SellerProfile
 from django.db.models import Q
 from django.contrib import messages
 from django.db.models import Count
+from django.db.models import Sum
 
 
 def home(request):
 
     categories = Category.objects.all()
     subcategories = SubCategory.objects.all()
-    product_types = ProductType.objects.all()
+    # product_types = ProductType.objects.all()
 
-    products = Product.objects.filter(
-        is_deleted = False
+    products = Product.objects.select_related(
+        'category',
+        'subcategory',
+        'product_type',
+        'seller'
+    ).prefetch_related(
+        'images'
+    ).filter(
+        is_deleted=False
     ).order_by('-id')
 
     seller_categories = None
@@ -77,8 +85,15 @@ def home(request):
             "No matching products found. Showing all products."
         )
 
-        products = Product.objects.filter(
-            is_deleted = False
+        products = Product.objects.select_related(
+            'category',
+            'subcategory',
+            'product_type',
+            'seller'
+        ).prefetch_related(
+            'images'
+        ).filter(
+            is_deleted=False
         ).order_by('-id')
 
 
@@ -93,9 +108,21 @@ def home(request):
                 user.seller_profile.categories.all()
             )
 
-    best_seller = Product.objects.filter(
-        orderitem__status = 'Delivered'
-    ).annotate(total_sold = Count('orderitem')).order_by('-total_sold')[:4]
+
+    best_seller = Product.objects.select_related(
+        'category',
+        'subcategory',
+        'product_type',
+        'seller'
+    ).prefetch_related(
+        'images'
+    ).filter(
+        orderitem__status='Delivered',
+        is_deleted=False
+    ).annotate(
+        total_sold = Sum('orderitem__quantity')
+    ).order_by('-total_sold')[:4]
+
 
     if not ( search or cat_id or sub_id or product_type_id or min_price or max_price ):
         products = products.exclude(
@@ -107,7 +134,7 @@ def home(request):
 
         'categories': categories,
         'subcategories': subcategories,
-        'product_types': product_types,
+        # 'product_types': product_types,
         'products': products,
         'seller_categories': seller_categories,
         'best_sellers' : best_seller 

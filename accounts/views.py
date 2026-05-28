@@ -4,9 +4,11 @@ from .models import SellerProfile, User
 from .forms import LoginForm, BuyerRegisterForm, SellerRegisterForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
-from products.models import Product
+from products.models import Product, Category
 from orders.models import OrderItem, Order
 from cart.models import CartItem
+from django.db.models import Q, Count
+from django.db.models import Prefetch
 
 
 # for register choice page
@@ -123,7 +125,13 @@ def seller_dashboard(request):
         seller = SellerProfile.objects.create(user=user)
 
     categories = seller.categories.all()
-    product=user.products.filter(
+
+
+    product = user.products.select_related(
+        'product_type'
+    ).prefetch_related(
+        'images'
+    ).filter(
         is_deleted = False
     ).order_by('-id')
 
@@ -131,19 +139,13 @@ def seller_dashboard(request):
         seller=request.user
     ).count()
 
-    total_orders = OrderItem.objects.filter(
-        seller=request.user
-    ).count()
-
-    pending_orders = OrderItem.objects.filter(
-        seller=request.user,
-        status='Pending'
-    ).count()
-
-    delivered_orders = OrderItem.objects.filter(
-        seller = request.user,
-        status = 'Delivered'
-    ).count()
+    order_item_stats = OrderItem.objects.filter(
+        seller = request.user
+    ).aggregate(
+        pending_orders = Count('id', filter= Q(status = 'Pending')),
+        delivered_orders = Count('id', filter= Q( status = 'Delivered')),
+        total_orders = Count('id')
+    )
 
     recent_orders = OrderItem.objects.filter(
         seller = request.user
@@ -154,9 +156,9 @@ def seller_dashboard(request):
         'products' : product,
 
         'total_products' : total_products,
-        'total_orders' : total_orders,
-        'pending_orders' : pending_orders,
-        'delivered_orders' : delivered_orders
+        'total_orders' : order_item_stats['total_orders'],
+        'pending_orders': order_item_stats['pending_orders'],
+        'delivered_orders': order_item_stats['delivered_orders'],
     })
 
 @login_required
@@ -175,10 +177,11 @@ def out_of_stock(request):
 @login_required
 def deleted_products(request):
 
-    products = Product.objects.filter(
+    products = Product.objects.prefetch_related(
+        'images'
+    ).filter(
         seller = request.user,
         is_deleted = True
-
     ).order_by('-id')
 
 
@@ -197,7 +200,10 @@ def deleted_product_buyers(request ,id):
         is_deleted = True
     )
 
-    cart_items = CartItem.objects.filter(
+    cart_items = CartItem.objects.select_related(
+        'cart',
+        'cart__user'
+    ).filter(
         product = product
     )
 
@@ -214,13 +220,10 @@ def admin_required(user):
 @user_passes_test(admin_required)
 def admin_dashboard(request):
 
-    total_seller = SellerProfile.objects.filter(
-        user__role = 'seller'
-    ).count()
-
-    total_buyer = User.objects.filter(
-        role = 'buyer'
-    ).count()
+    total_seller_buyer = User.objects.aggregate(
+        total_seller = Count('id', filter= Q(role = 'seller')),
+        total_buyer= Count('id', filter= Q( role = 'buyer'))
+    )
 
     total_products = Product.objects.filter(
         is_deleted= False
@@ -229,20 +232,29 @@ def admin_dashboard(request):
     total_orders =Order.objects.count()
 
     sellers = SellerProfile.objects.select_related(
-        'user'
+        'user',
+    ).prefetch_related(
+        'categories'
     ).order_by('-id')
 
-    buyers = User.objects.filter(
+    buyers = User.objects.prefetch_related(
+        'orders'
+    ).filter(
         role = 'buyer'
     ).order_by('-id')
 
+    categories = Category.objects.prefetch_related(
+        'subcategories__product_types'
+    )
+
     return render(request,'accounts/admin_dashboard.html',{
-        'total_seller' : total_seller , 
-        'total_buyer' : total_buyer,
+        'total_seller' : total_seller_buyer['total_seller'] , 
+        'total_buyer' : total_seller_buyer['total_buyer'],
         'total_products' : total_products,
         'total_orders' : total_orders,
         'sellers' : sellers,
-        'buyers' : buyers
+        'buyers' : buyers,
+        'categories' : categories
     })
 
 
@@ -251,7 +263,9 @@ def admin_dashboard(request):
 def admin_seller_detail(request,id):
 
     seller = get_object_or_404(
-        SellerProfile,
+        SellerProfile.objects.select_related(
+            'user'
+        ),
         id =id
     )
 
@@ -270,12 +284,19 @@ def admin_seller_detail(request,id):
 def admin_buyer_detail(request,id):
 
     buyer = get_object_or_404(
-        User,
+        User.objects.prefetch_related(
+            'orders',
+            'wishlist_set',
+            
+        ),
         role = 'buyer',
         id=id
     )
 
-    order = OrderItem.objects.filter(
+    order = OrderItem.objects.select_related(
+        'order',
+        'product'
+    ).filter(
         order__buyer=buyer,   
         # left side must be actual model field nd right side actual python  object/value 
 

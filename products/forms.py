@@ -1,5 +1,5 @@
 from django import forms
-from .models import Product, SubCategory, ProductType, Category, ProductImage
+from .models import Product, SubCategory, ProductType, Category, ProductImage 
 
 
 class CategoryForm(forms.ModelForm):
@@ -7,6 +7,28 @@ class CategoryForm(forms.ModelForm):
         model = Category
         fields = ['name', 'image']
 
+        widgets={
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'image': forms.FileInput(attrs={'class': 'form-control'})
+        }
+
+class SubCategoryForm(forms.ModelForm):
+    class Meta:
+        model = SubCategory
+        fields = ['name','image']
+
+        widgets={
+            'name' : forms.TextInput(attrs={'class': 'form-control'}),
+            'image': forms.FileInput(attrs={'class': 'form-control'})
+        }
+class ProductTypeForm(forms.ModelForm):
+    class Meta:
+        model = ProductType
+        fields = ['name','image']
+        widgets={
+            'name' : forms.TextInput(attrs={'class': 'form-control'}),
+            'image' : forms.FileInput(attrs={'class':'form-control'})
+        }
 
 class ProductForm(forms.ModelForm):
 
@@ -39,3 +61,5 @@ class ProductImageForm(forms.ModelForm):
     class Meta:
         model = ProductImage
         fields = ['image']
+
+        

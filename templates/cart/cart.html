@@ -15,7 +15,7 @@
 
                     <!-- Image -->
                     <div class="col-md-2">
-                        {%if item.product.images.first %}
+                        {%if item.product.images.all %}
                             <img src="{{ item.product.images.first.image.url }}" class="img-fluid" style="object-fit: cover; height: 120px;" >
                         {% endif %}
                     </div>
@@ -46,7 +46,7 @@
 
                        {% if request.GET.error_item == item.id|stringformat:"s" %}
                             <small class="text-danger">
-                                Quantity can't be less than 1 and more than 5 or stock available!
+                                Quantity can't be more than 5 or stock available!
                             </small>    
                         {% endif %}
 
@@ -57,9 +57,15 @@
                     </div>
 
                     <!-- total price -->
-                    <div class="col-md-2">
+                    <div class="col-md-1">
                         <strong>₹ {{item.total_price}}</strong>
                     </div>
+
+                    {% if item.product.stock < item.quantity %}
+                    <span class="badge bg-danger col-md-1">
+                        out of stock
+                    </span>
+                    {% endif %}
 
                     <div class="col-md-2">
                         <a href="{% url 'buy_now' item.product.id%}" class="btn btn-outline-primary btn-sm">Buy Now</a>
@@ -77,7 +83,11 @@
         <!-- All Product Total -->
          <div class="text-end mt-4">
             <h3>Total: ₹{{ total }}</h3>
-            <a href="{% url 'checkout' %}" class="btn btn-outline-success btn-sm">Procced To Checkout</a>
+            {%if item.product.stock < item.quantity %}
+                <button class="btn btn-outline-success btn-sm" disabled>Procced To Checkout</button>>
+            {% else %}
+                <a href="{% url 'checkout' %}" class="btn btn-outline-success btn-sm">Procced To Checkout</a>
+            {% endif %}
          </div>
 
     </div>

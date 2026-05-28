@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .forms import ProductForm, ProductImageForm
+from .forms import ProductForm, ProductImageForm, CategoryForm, SubCategoryForm, ProductTypeForm
 from .models import Category, SubCategory, ProductType, ProductImage
 from cart.models import CartItem
 from django.contrib import messages
@@ -170,9 +170,201 @@ def delete_product(request, id):
 def product_detail(request, id):
 
     product = get_object_or_404(
-        Product,
+        Product.objects.select_related(
+            'seller__seller_profile',
+            'category',
+            'product_type'
+        ).prefetch_related(
+            'images'
+        ),
         id = id,
         is_deleted = False
     )
 
     return render(request, 'products/product_detail.html',{'product': product})
+
+
+'''add catgory from admin nd edit nd show all category '''
+def category_list(request):
+
+    categories = Category.objects.all()
+    # category_form = CategoryForm()
+
+    edit_id= request.GET.get('edit')
+
+    if edit_id:
+        category = Category.objects.get(id=edit_id)
+        category_form =  CategoryForm(
+            instance=category
+            )
+    else:
+        category_form = CategoryForm()
+        
+    if request.method == 'POST':
+        edit_id = request.POST.get('edit_id')
+
+        if edit_id:
+            category = Category.objects.get(id= edit_id)
+            category_form = CategoryForm(
+                request.POST,
+                request.FILES,
+                instance=category
+            )
+
+        else:
+            category_form =  CategoryForm(
+                request.POST,
+                request.FILES
+            )
+
+        if category_form.is_valid():
+            category_form.save()
+            return redirect('category_list')
+
+    return render(request,'dashboard/categories.html',{ 
+        'categories' : categories,
+        'category_form': category_form,
+        'edit_id': edit_id
+        })
+
+def delete_category(request, id):
+    category = get_object_or_404(
+        Category,
+        id = id
+    )
+    category.delete()
+    return redirect('category_list')
+
+'''add subcategory form category view nd also edit nd delete subcatgory'''
+def subcategory_list(request, id):
+
+    category = get_object_or_404(
+        Category,
+        id = id
+    )
+
+    subcategories = SubCategory.objects.filter(
+        category = category
+    )
+    edit_sub_id = request.GET.get('edit_sub')
+
+    subcategory_form = SubCategoryForm()
+
+    if edit_sub_id:
+        subcategory = SubCategory.objects.get(id=edit_sub_id)
+        subcategory_form = SubCategoryForm(
+            instance=subcategory
+        )
+    else:
+        subcategory_form = SubCategoryForm()
+
+    if request.method == 'POST':
+        edit_sub_id = request.POST.get('edit_sub_id')
+
+        if edit_sub_id:
+            subcategory = SubCategory.objects.get(id=edit_sub_id)
+            subcategory_form=SubCategoryForm(
+                request.POST,
+                request.FILES,
+                instance=subcategory
+                )
+        else:
+            subcategory_form = SubCategoryForm(
+                request.POST,
+                request.FILES
+            )
+
+        if subcategory_form.is_valid():
+            '''commit=false bcoz it save temp object not direct in db so we can add before FK like in this we attach catgory to subcategory'''
+            subcategory = subcategory_form.save(
+                commit= False
+            )
+            subcategory.category = category
+            subcategory.save()
+
+            return redirect('subcategory_list',id=category.id)
+        
+    return render(request,'dashboard/subcategory_list.html',{
+        'category' : category,
+        'subcategories' : subcategories,
+        'subcategory_form' : subcategory_form,
+        'edit_sub_id' : edit_sub_id
+    })
+
+def delete_subcategory(request, id):
+
+    subcategory = get_object_or_404(
+        SubCategory,
+        id = id
+    )
+    '''category_id use bcoz after delete subcategory is deleted so using category id redirect page '''
+    category_id = subcategory.category.id
+    subcategory.delete()
+    return redirect('subcategory_list',id=category_id)
+
+'''productType for add from subcategory view foo speific subcat add productTypes nd also edit'''
+def productType_list(request, id):
+
+    subcategory = get_object_or_404(
+        SubCategory,
+        id = id
+    )
+
+    productTypes = ProductType.objects.filter(
+        subcategory = subcategory
+    )
+
+    edit_id = request.GET.get('edit')
+    productType_form = ProductForm()
+
+    if edit_id:
+        productType = ProductType.objects.get(id=edit_id)
+        productType_form = ProductTypeForm(
+            instance=productType
+        )
+
+    else:
+        productType_form = ProductTypeForm()
+
+    if request.method == 'POST':
+        edit_id =request.POST.get('edit_id')
+
+        if edit_id:
+            productType = ProductType.objects.get(id=edit_id)
+            productType_form = ProductTypeForm(
+                request.POST,
+                request.FILES,
+                instance=productType
+            )
+        else:
+            productType_form = ProductTypeForm(
+                request.POST,
+                request.FILES
+            )
+
+        if productType_form.is_valid():
+            productType = productType_form.save(
+                commit=False
+            )
+            productType.subcategory = subcategory
+            productType.save()
+
+            return redirect('productType_list',id=subcategory.id)
+    
+    return render(request,'dashboard/productType_list.html',{
+        'subcategory' : subcategory,
+        'productTypes' : productTypes,
+        'productType_form' : productType_form,
+        'edit_id' : edit_id
+    })
+
+
+def delete_productType(request, id):
+    productType = get_object_or_404(
+        ProductType,
+        id = id
+    )
+    subcategory_id = productType.subcategory.id
+    productType.delete()
+
+    return redirect('productType_list',id=subcategory_id)

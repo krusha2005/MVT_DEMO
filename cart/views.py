@@ -48,7 +48,10 @@ def cart_view(request):
         user=request.user
     )
 
-    cart_items = cart.items.all()
+    cart_items = CartItem.objects.filter(cart = cart).select_related(
+        'product',
+        'product__seller',
+    ).prefetch_related('product__images')
 
     total = 0
     for item in cart_items:
@@ -78,13 +81,13 @@ def increase_quantity(request,id):
 def decrease_quantity(request,id):
 
     item=get_object_or_404( CartItem, id=id)
-
     if(item.quantity > 1):
         item.quantity -= 1
         item.save()
-
+    else:
+        item.delete()
         return redirect('cart')
-
+    
     return redirect(f"{reverse('cart')}?error_item={item.id}")
 
 @login_required

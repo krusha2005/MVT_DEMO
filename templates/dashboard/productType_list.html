@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Product Type{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between text-align-center">
+        <h2>{{ subcategory.name }} Product Type </h2>
+        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#productTypeModal"><strong>+</strong>Add ProductType</button>
+    </div>
+    <hr>
+    <div class="row">
+        {% for type in productTypes %}
+            <div class="col-md-3">
+                <div class="card shadow-sm p-2">
+                    <img src="{{ type.image.url }}" style="object-fit: cover; height: 250px;" class="mb-2">
+                    <h5>{{ type.name }}</h5>
+
+                    <div class="d-flex gap-2">
+                        <a href="?edit={{type.id}}" class="btn btn-outline-warning w-100">Edit</a>
+                        <a href="{% url 'delete_productType' type.id %}" class="btn btn-outline-danger w-100">Delete</a>
+                    </div>
+                </div>
+            </div>
+            {% empty%}
+                <h5>ProductType Not Found!</h5>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="modal fade" id="productTypeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title text-success" style="font-weight: 500; font-size: x-large;">Product Type</div>
+                <button data-bs-dismiss="modal" class="btn-close" type="button"></button>
+            </div>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                {% if edit_id %}
+                    <input type="hidden" value="{{edit_id}}" name="edit_id">
+                {% endif %}
+
+                <div class="modal-body">
+                    {{ productType_form.as_p }}
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline-success" type="submit">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% if edit_id %}
+<script>
+    document.addEventListener('DOMContentLoaded',function(){
+        var myModal = new bootstrap.Modal(
+            document.getElementById('productTypeModal')
+        );
+        myModal.show();
+    });
+</script>
+{% endif %}
+{% endblock %}
