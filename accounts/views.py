@@ -36,16 +36,60 @@ def buyer_register(request):
     return render(request, 'accounts/buyer_register.html', {'form': form})
 
 
+# # for login for buyer nd seller both
+# def user_login(request):
+#     if request.method == 'POST':
+#         form = LoginForm(request, data=request.POST)
+
+#         if form.is_valid():
+#             user = form.get_user()
+#             login(request, user)
+
+#             # 🔥 role-based redirect
+#             if user.is_superuser:
+#                 return redirect('admin_dashboard')
+#             elif user.role == 'seller':
+#                 return redirect('home')
+#             else:
+#                 return redirect('home')
+
+
+#     else:
+#         form = LoginForm()
+
+#     return render(request, 'accounts/login.html', {'form': form})
+
 # for login for buyer nd seller both
 def user_login(request):
+
     if request.method == 'POST':
         form = LoginForm(request, data=request.POST)
+
+        username=request.POST.get('username')
+        password=request.POST.get('password')
+
+        # username not exist
+
+        if not User.objects.filter( username=username ).exists():
+            form.add_error('username','Username does not exist!')
+
+        else:
+            user = authenticate(request,
+                                username=username,
+                                password=password)
+            
+            if user is None:
+                form.add_error('password','Invalid Password!')
+            else:
+                login(request,user)
+
+                return redirect('home')
 
         if form.is_valid():
             user = form.get_user()
             login(request, user)
 
-            # 🔥 role-based redirect
+            # role-based redirect
             if user.is_superuser:
                 return redirect('admin_dashboard')
             elif user.role == 'seller':
@@ -58,6 +102,7 @@ def user_login(request):
         form = LoginForm()
 
     return render(request, 'accounts/login.html', {'form': form})
+
 
 def user_logout(request):
     logout(request)

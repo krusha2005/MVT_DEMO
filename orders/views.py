@@ -79,7 +79,7 @@ def place_order(request):
     state=request.POST.get('state')
     buy_product_id=request.POST.get('buy_product_id')
 
-    if len(phone)!=10:
+    if not phone.isdigit() or len(phone)!=10:
         return render(request,'orders/checkout.html',{
             'phone_error':'phone number must be 10 digits!',
             'cart_items':cart_items,

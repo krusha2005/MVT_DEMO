@@ -3,74 +3,118 @@
 {% block content %}
 
 <div class="row justify-content-center">
-    <div class="col-md-6">
+    <div class="col-md-5 w-40">
 
         <div class="card shadow">
             <div class="card-header text-center">
-                <h4>Seller Registration</h4>
+                <h4 class="text-success">Seller Registration</h4>
             </div>
 
             <div class="card-body">
-
-                <form method="POST">
+                <form method="post">
                     {% csrf_token %}
-
                     {{ form.non_field_errors }}
+                    <table class="table table-borderless">
 
-                    <div class="mb-3">
-                        <label>Username</label>
-                        {{ form.username }}
-                    </div>
+                        <tbody style="vertical-align: middle;">
+                            <tr class="mb-2">
+                                <td>Username</td>
+                                <td>
+                                    {{form.username}}
+                                    {%if form.username.errors%}
+                                    <div class="text-danger">
+                                        {{form.username.errors.0}}
+                                    </div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr class="mb-2">
+                                <td>Email</td>
+                                <td >{{ form.email}}
+                                    {% if form.email.errors %}
+                                        <div class="text-danger">
+                                            {{ form.email.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr class="mb-2">
+                                <td>Password</td>
+                                <td>{{form.password}}
+                                    {% if form.password.errors %}
+                                        <div class="text-danger">
+                                            {{ form.password.errors.0 }}
+                                        </div>
+                                    {%endif %}
+                                </td>
+                            </tr>
+                            <tr class="mb-2">
+                                <td>Store Name</td>
+                                <td>{{form.store_name}}
+                                    {%if form.store_name.errors%}
+                                    <div class="text-danger">
+                                        {{form.store_name.errors.0}}
+                                    </div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr class="mb-2">
+                                <td>Phone</td>
+                                <td>{{form.phone}}
+                                    {% if form.phone.errors %}
+                                        <div class="text-danger">
+                                            {{ form.phone.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr class="mb-2">
+                                <td>City</td>
+                                <td>{{form.city}}</td>
+                                {% if form.field.errors %}
+                                <div class="text-danger">
+                                    {{ form.field.errors.0}}
+                                </div>
+                                {% endif %}
+                            </tr>
+                            <tr class="mb-2">
+                                <td>State</td>
+                                <td>{{form.state}}
+                                    {%if form.state.errors %}
+                                        <div class="text-danger">
+                                            {{form.state.errors.0}}
+                                        </div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr class="mb-2">
+                                <td>Select Categories</td>
+                                <td>{{form.categories}}
+                                {% if form.categories.errors %}
+                                    <div class="text-danger">
+                                        {{ form.categories.errors.0}}
+                                    </div>
+                                {% endif %}
+                                </td>
+                            </tr>
+                            <tr class="mb-2">
+                               <td colspan="2">
+                                <button class="btn btn-success w-100" type="submit">Register as Seller</button>
+                               </td>
+                            </tr>
+                        </tbody>
 
-                    <div class="mb-3">
-                        <label>Email</label>
-                        {{ form.email }}
-                    </div>
-
-                    <div class="mb-3">
-                        <label>Password</label>
-                        {{ form.password }}
-                    </div>
-
-                    <div class="mb-3">
-                        <label>Store Name</label>
-                        {{ form.store_name }}
-                    </div>
-
-                    <div class="mb-3">
-                        <label>Phone</label>
-                        {{ form.phone }}
-                    </div>
-
-                    <div class="mb-3">
-                        <label>City</label>
-                        {{ form.city }}
-                    </div>
-
-                    <div class="mb-3">
-                        <label>State</label>
-                        {{ form.state }}
-                    </div>
-
-                    <div class="mb-3">
-                        <label>Select Categories</label><br>
-                        {{ form.categories }}
-                    </div>
-
-                    <button type="submit" class="btn btn-success w-100">
-                        Register as Seller
-                    </button>
-
+                    </table>
                 </form>
 
             </div>
         </div>
 
-        {% if form.errors %}
+        <!-- {% if form.errors %}
         <div class="alert alert-danger">
             {{ form.errors }}
         </div>
-        {% endif %}
+        {% endif %} -->
 
     </div>
 </div>

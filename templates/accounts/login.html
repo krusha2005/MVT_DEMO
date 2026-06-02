@@ -20,34 +20,26 @@
                     <div class="mb-3">
                         <label>Username</label>
                         {{ form.username }}
+                        <div class="text-danger">
+                            {{form.username.errors.0}}
+                        </div>
                     </div>
 
                     <div class="mb-3">
                         <label>Password</label>
                         {{ form.password }}
+                        <div class="text-danger">
+                            {{ form.password.errors.0}}
+                        </div>
                     </div>
+                    
 
                     <button type="submit" class="btn btn-success w-100">
                         Login
                     </button>
                 </form> 
-
-                 {% if form.errors %}
-                    <div class="text-danger text-center mt-3" style="font-size: 0.9rem; font-weight: 500;">
-                        {% if form.non_field_errors %}
-                            {{ form.non_field_errors.0 }}
-                        {% elif form.username.errors %}
-                            {{ form.username.errors.0 }}
-                        {% elif form.password.errors %}
-                            {{ form.password.errors.0 }}
-                        {% else %}
-                            Invalid login details. Please try again.
-                        {% endif %}
-                    </div>
-                {% endif %} 
             </div>
         </div>
-
     </div>
 </div>
 
