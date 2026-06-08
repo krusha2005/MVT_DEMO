@@ -327,17 +327,14 @@ def admin_seller_detail(request,id):
 @login_required
 @user_passes_test(admin_required)
 def admin_buyer_detail(request,id):
-
     buyer = get_object_or_404(
         User.objects.prefetch_related(
             'orders',
             'wishlist_set',
-            
         ),
         role = 'buyer',
         id=id
     )
-
     order = OrderItem.objects.select_related(
         'order',
         'product'
@@ -346,7 +343,6 @@ def admin_buyer_detail(request,id):
         # left side must be actual model field nd right side actual python  object/value 
 
     ).order_by('-id')
-
     return render(request,'accounts/admin_buyer_detail.html',{
         'buyer': buyer,
         'orders':order
@@ -356,14 +352,11 @@ def admin_buyer_detail(request,id):
 @login_required
 @user_passes_test(admin_required)
 def delete_seller(request,id):
-
     seller = get_object_or_404(
         SellerProfile,
         id=id
     )
-
     seller.user.delete()
-
     messages.success(request ,'seller deleted successfully!')
 
     return redirect('admin_dashboard')
@@ -371,17 +364,13 @@ def delete_seller(request,id):
 
 @login_required
 @user_passes_test(admin_required)
-
 def delete_buyer(request,id):
-
     buyer = get_object_or_404(
         User,
         role = 'buyer',
         id=id
     )
-
     buyer.delete()
-
     messages.success(request,'buyer deleted successfully!')
 
     return redirect('admin_dashboard')

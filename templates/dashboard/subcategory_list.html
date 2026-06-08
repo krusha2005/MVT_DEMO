@@ -16,7 +16,9 @@
         {% for sub in subcategories %}
         <div class="col-md-3">
             <div class="card shadow-sm mb-3 p-2">
-                <img src="{{ sub.image.url }}" style="object-fit: cover; height: 250px;" class="mb-2">
+                {%if sub.image %}
+                    <img src="{{ sub.image.url }}" style="object-fit: cover; height: 250px;" class="mb-2">
+                {% endif %}    
                 <h5>{{ sub.name }}</h5>
                 <div class="d-flex gap-2">
                     <a class="btn btn-outline-primary w-100" href="{% url 'productType_list' sub.id %}">View</a>

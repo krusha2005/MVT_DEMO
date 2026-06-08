@@ -19,8 +19,9 @@
         {% for cat in categories %}
         <div class="col-md-3 mb-2">
             <div class="card shadow-sm p-2">
-
-                <img src="{{ cat.image.url }}" style="object-fit: cover; height: 250px;">
+                {%if cat.image %}
+                    <img src="{{ cat.image.url }}" style="object-fit: cover; height: 250px;">
+                {% endif %}
                 <h5 class="mt-2">{{ cat.name }}</h5>
 
                 <div class="d-flex gap-2 ">

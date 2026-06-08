@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 from pathlib import Path
 import os 
 from decouple import config
+from celery.schedules import crontab
+from datetime import timedelta
 
 
 DEBUG = config('DEBUG', cast=bool)
@@ -48,6 +50,8 @@ INSTALLED_APPS = [
     'products',
     'wishlist',
     'debug_toolbar',
+    'django_celery_results',
+    'django_celery_beat'
 ]
 
 MIDDLEWARE = [
@@ -150,6 +154,16 @@ USE_I18N = True
 TIME_ZONE = 'UTC'
 USE_TZ = True
 
+
+CELERY_BROKER_URL = 'redis://redis_broker:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_BACKEND = 'redis://redis_broker:6379'
+CELERY_TIMEZONE = 'UTC'
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
@@ -165,10 +179,24 @@ STATICFILES_DIRS = [
 # ]
 
 
-import socket
+# import socket
 
-hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
+# hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
 
-INTERNAL_IPS = [
-    ip[: ip.rfind(".")] + ".1" for ip in ips
-] + ["127.0.0.1"]
+# INTERNAL_IPS = [
+#     ip[: ip.rfind(".")] + ".1" for ip in ips
+# ] + ["127.0.0.1"]
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+
+CELERY_BEAT_SCHEDULE = {
+    # "say-hello-every-1-minutes": {
+    #     "task": "accounts.tasks.msg",
+    #     "schedule": timedelta(seconds=5),
+    # },
+  
+    "cart-reminder-every-5-seconds":{
+        "task": "cart.tasks.cart_reminder",
+        "schedule": timedelta(seconds=5),
+    }
+}
+

@@ -29,3 +29,34 @@ services:
 
     ports:
       - "5433:5432"
+
+    volumes:
+      - docker_mvtdemo_db:/var/lib/postgresql
+
+  redis:
+    image: redis
+    container_name: redis_broker
+    ports:
+      - "6380:6379"
+
+  celery_worker:
+    build: .
+    container_name: celery_worker
+    command: celery -A config worker -l info
+    depends_on:
+      - redis
+    volumes:
+      - .:/app
+
+  celery_beat:
+    build: .
+    container_name: celery_beat
+    command: celery -A config beat -l info
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+      - celery_worker
+
+volumes:
+  docker_mvtdemo_db:

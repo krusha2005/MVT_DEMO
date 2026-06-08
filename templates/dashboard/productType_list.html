@@ -13,7 +13,9 @@
         {% for type in productTypes %}
             <div class="col-md-3">
                 <div class="card shadow-sm p-2">
-                    <img src="{{ type.image.url }}" style="object-fit: cover; height: 250px;" class="mb-2">
+                    {% if type.image %}
+                        <img src="{{ type.image.url }}" style="object-fit: cover; height: 250px;" class="mb-2">
+                    {% endif %}    
                     <h5>{{ type.name }}</h5>
 
                     <div class="d-flex gap-2">

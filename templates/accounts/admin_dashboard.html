@@ -52,7 +52,9 @@
                  <h2 class="accordion-header" id="heading{{ cat.id }}">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ cat.id }}">
                         <div class="d-flex align-items-center gap-3">
-                            <img src="{{ cat.image.url }}" width="50" height="50" style="object-fit: cover; border-radius: 8px;">
+                            {%if cat.iamge %}
+                                <img src="{{ cat.image.url }}" width="50" height="50" style="object-fit: cover; border-radius: 8px;">
+                            {% endif %}
                             <strong>{{ cat.name }}</strong>
                         </div>
                     </button>
@@ -72,7 +74,9 @@
                             <div class="card-body">
                                 <div class="justify-content-between d-flex align-items-center">
                                     <div class="d-flex align-items-center gap-3">
-                                        <img src="{{ sub.image.url}}" width="45" height="45" style="object-fit: cover; border-radius: 6px;">
+                                        {% if sub.image %}
+                                            <img src="{{ sub.image.url }}" width="45" height="45" style="object-fit: cover; border-radius: 6px;">
+                                        {% endif %}
                                         <h5>{{ sub.name }}</h5>
                                     </div>
                                     <a href="{% url 'productType_list' sub.id %}" class="btn btn-outline-success btn-sm">Manage productTypes</a>

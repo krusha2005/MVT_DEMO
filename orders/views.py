@@ -6,6 +6,7 @@ from .models import Order, OrderItem
 from products.models import Product
 from django.contrib import messages
 from django.db.models import Q, Count
+from orders.tasks import order_mail
 
 @login_required
 def checkout(request):
@@ -113,6 +114,7 @@ def place_order(request):
             city=city,
             state=state
         )
+        order_mail.delay_on_commit(order.id)
 
         OrderItem.objects.create(
             order=order,
@@ -122,7 +124,6 @@ def place_order(request):
             price=product.price,
             total_price=buy_total
         )
-
         product.stock -= buy_quantity
         product.save()
 
@@ -142,6 +143,7 @@ def place_order(request):
             city=city,
             state=state
         )
+        order_mail.delay_on_commit(order.id)
 
         for item in cart_items:
             product = item.product

@@ -48,7 +48,12 @@ def cart_view(request):
         user=request.user
     )
 
-    cart_items = CartItem.objects.filter(cart = cart).select_related(
+    # cart_items = CartItem.objects.filter(cart = cart).select_related(
+    #     'product',
+    #     'product__seller',
+    # ).prefetch_related('product__images')
+
+    cart_items = cart.items.all().select_related(
         'product',
         'product__seller',
     ).prefetch_related('product__images')
