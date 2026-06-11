@@ -77,7 +77,7 @@
 
 
      <div class="row mb-4 mt-4">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <a href="{% url 'seller_orders' %}">
             <div  class="card shadow-sm p-3 ">
                 <h4>Manage Orders</h4>
@@ -85,7 +85,7 @@
             </a>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-md-3">
             <a href="{% url 'out_of_stock' %}">
                 <div class="card shadow-sm p-3">
                     <h4>Out Of Stock</h4>
@@ -93,10 +93,17 @@
             </a>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-md-3">
             <a href="{% url 'deleted_products' %}">
                 <div class="card shadow-sm p-3">
                     <h4> Deleted Products</h4>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{% url 'seller-chat-list' %}">
+                <div class="card shadow-sm p-3">
+                    <h4> buyer chats</h4>
                 </div>
             </a>
         </div>

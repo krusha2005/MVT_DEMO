@@ -20,8 +20,8 @@ class Category(models.Model):
     image = models.ImageField(
         upload_to='categories/',
         validators=[validate_image],
-        # null=True,
-        # blank=True
+        null=True,
+        blank=True
     )
 
     def save(self, *args, **kwargs):
@@ -37,7 +37,7 @@ class Category(models.Model):
 class SubCategory(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='subcategories')
     name = models.CharField(max_length=100)
-    image = models.ImageField(upload_to='subcategories/')
+    image = models.ImageField(upload_to='subcategories/',null=True,blank=True)
 
     def save(self, *args, **kwargs):
         if self.image:
@@ -88,7 +88,7 @@ class ProductType(models.Model):
         related_name='product_types'
     )
     name = models.CharField(max_length=100)
-    image = models.ImageField(upload_to='product_types/')
+    image = models.ImageField(upload_to='product_types/',null=True,blank=True)
 
     def __str__(self):
         return self.name

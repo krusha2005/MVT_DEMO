@@ -49,9 +49,11 @@ INSTALLED_APPS = [
     'orders',
     'products',
     'wishlist',
+    'chat',
     'debug_toolbar',
     'django_celery_results',
-    'django_celery_beat'
+    'django_celery_beat',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -82,8 +84,19 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
+# WSGI_APPLICATION = 'config.wsgi.application'
 
+ASGI_APPLICATION = 'config.asgi.application'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("redis", 6379)],
+        },
+    },
+}
+                                                                                                         
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
@@ -157,8 +170,6 @@ USE_TZ = True
 
 CELERY_BROKER_URL = 'redis://redis_broker:6379'
 CELERY_ACCEPT_CONTENT = ['application/json']
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'redis://redis_broker:6379'
 CELERY_TIMEZONE = 'UTC'
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
@@ -167,11 +178,13 @@ CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
+
+STATIC_ROOT = BASE_DIR /"staticfiles"
 
 # INTERNAL_IPS = [
 #     "127.0.0.1",

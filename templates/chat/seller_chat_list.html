@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content%}
+
+<h1 class="text-success">Buyer Messages</h1>
+
+{% for room in rooms %}
+<div class="col-md-12 mb-3">
+    <div class="card shadow-sm p-3">
+        <p>
+           <strong>Buyer:</strong> {{ room.buyer.username }}
+        </p>
+        <p>
+           <strong>Product:</strong> {{ room.product.name }}
+        </p>
+        <a href="{% url 'chat-room' room.id %}" class="btn btn-outline-success btn-sm" style="width: 10%;"> Open Chat </a>
+    </div>
+</div>
+{% empty %}
+<p>No chats available</p>
+{% endfor %}
+{% endblock %}
